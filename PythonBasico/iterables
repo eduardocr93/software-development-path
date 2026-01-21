@@ -1,0 +1,47 @@
+first_list = ['Hay', 'en', 'que', 'iteracion', 'indices', 'muy']
+second_list = ['casos', 'los', 'la', 'por', 'es', 'util']
+
+for i in range(len(first_list)):
+    print(first_list[i], second_list[i])
+print("-------------------------")
+
+#---------------------------------------------------------------
+
+my_string = 'Pizza con piña'
+for char in my_string[::-1]:
+    print(char)
+print("-------------------------")
+
+#---------------------------------------------------------------
+
+my_list = [4, 3, 6, 1, 7]
+if len(my_list) > 1:
+    my_list[0], my_list[-1] = my_list[-1], my_list[0]
+    print(my_list)
+print("-------------------------")
+
+#---------------------------------------------------------------
+
+my_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+even_list = []
+for num in my_list:
+    if num % 2 == 0:
+        even_list.append(num)
+print(my_list)
+print(even_list)
+print("-------------------------")
+
+#---------------------------------------------------------------
+
+numbers = []
+for i in range(10):
+    num = int(input(f"Ingrese el número {i+1}: "))
+    numbers.append(num)
+
+highest = numbers[0]   # asumimos que el primero es el mayor
+for num in numbers:
+    if num > highest:
+        highest = num
+print("Números ingresados:", numbers)
+print("El más alto fue", highest)
+

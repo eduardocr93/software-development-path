@@ -1,0 +1,60 @@
+1. Inicio
+2. Definir precio
+3. Definir descuento
+4. Definir precio_final
+5. Mostrar "Ingrese el precio del producto"
+6. Pedir precio
+7. Si (precio < 100) entonces
+   	1. descuento = precio * 0.02
+8. Sino
+        1. descuento = precio * 0.10
+9. FinSi
+10. precio_final = precio - descuento
+11. Mostrar "El precio final con descuento es:"
+12. Mostrar precio_final
+13. Fin
+
+
+
+----------------------------------------------------------
+
+
+1. Inicio
+2. Definir tiempo_en_segundos
+3. Definir faltante
+4. Mostrar "Ingrese un tiempo en segundos"
+5. Pedir tiempo_en_segundos
+6. Si (tiempo_en_segundos < 600) entonces
+        1. faltante = 600 - tiempo_en_segundos
+        2. Mostrar "Faltan"
+        3. Mostrar faltante
+        4. Mostrar "segundos para llegar a 10 minutos"
+7. Sino
+        1. Si (tiempo_en_segundos = 600) entonces
+            1. Mostrar "Igual"
+        2. Sino
+            1. Mostrar "Mayor"
+        3. FinSi
+8. FinSi
+9. Fin
+
+
+--------------------------------------------------------
+
+
+1. Inicio
+2. Definir numero
+3. Definir contador
+4. Definir suma
+5. Mostrar "Ingrese un número"
+6. Pedir numero
+7. suma = 0
+8. contador = 1
+9. Mientras (contador ≤ numero) hacer
+        1. suma = suma + contador
+        2. contador = contador + 1
+10. FinMientras
+11. Mostrar "La suma de los números del 1 hasta", numero, "es:"
+12. Mostrar suma
+13. Fin
+
