@@ -1,6 +1,3 @@
-from data.read_students import load_students_from_csv
-
-
 def calculate_average(student):
     return (
         float(student["Spanish"]) +
@@ -10,11 +7,10 @@ def calculate_average(student):
     ) / 4
 
 
-def show_top_3_students():
-    students = load_students_from_csv()
+def show_top_3_students(students):
 
     if not students:
-        print("No students found.")
+        print("No students in memory. Add or import first.")
         return
 
     sorted_students = sorted(students, key=calculate_average, reverse=True)

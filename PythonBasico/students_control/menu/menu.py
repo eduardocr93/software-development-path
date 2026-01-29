@@ -8,8 +8,6 @@ from actions.import_students import import_students
 from actions.delete_students import delete_students
 from actions.failed_students import show_failed_students
 
-
-
 def show_menu():
     print("1. Add student")
     print("2. Student information")
@@ -21,27 +19,27 @@ def show_menu():
     print("8. Failed students")
     print("9. Exit")
 
-def validate_menu_options():
+def validate_menu_options(students):
     while True:
         show_menu()
-        option = get_option(1,9)
+        option = get_option(1, 9)
 
         if option == 9:
             break
 
         if option == 1:
-            validate_students_data()
+            validate_students_data(students)
         elif option == 2:
-            show_students()
+            show_students(students)
         elif option == 3:
-            show_top_3_students()
+            show_top_3_students(students)
         elif option == 4:
-            show_overall_average()
+            show_overall_average(students)
         elif option == 5:
-            export_students()
+            export_students(students)
         elif option == 6:
-            import_students()
+            import_students(students)
         elif option == 7:
-            delete_students()
+            delete_students(students)
         elif option == 8:
-            show_failed_students()
+            show_failed_students(students)

@@ -1,5 +1,5 @@
-from data.save_students import save_students_to_csv
 from actions.get_option import get_option
+
 
 def get_valid_grade(subject):
     while True:
@@ -9,9 +9,9 @@ def get_valid_grade(subject):
                 return grade
             else:
                 print("Grade must be between 0 and 100.")
-
         except ValueError:
             print("Invalid input. Please enter a number.")
+
 
 def get_valid_class():
     while True:
@@ -34,12 +34,14 @@ def get_valid_class():
 
         return class_input
 
+
 def get_valid_name():
     while True:
         name = input("Full name: ").strip()
         if name:
             return name
-        print("Name cannot be empty.")       
+        print("Name cannot be empty.")
+
 
 def get_student_data():
     name = get_valid_name()
@@ -49,7 +51,7 @@ def get_student_data():
     social_studies = get_valid_grade("Social Studies")
     science = get_valid_grade("Science")
 
-    student = {
+    return {
         'Name': name,
         'Class': student_class,
         'Spanish': spanish,
@@ -58,24 +60,24 @@ def get_student_data():
         'Science': science
     }
 
-    save_students_to_csv([student])
 
-    return student
+def add_student(students):
+    student = get_student_data()
+    students.append(student)
 
-def validate_students_data():
-    students = []
 
+def add_students_loop(students):
     while True:
-        student = get_student_data()
-        students.append(student)
+        add_student(students)
 
         print("Do you want to add another student?")
         print("1. Yes")
         print("2. Return")
 
-        choice = get_option(1,2)
-
+        choice = get_option(1, 2)
         if choice == 2:
             break
 
-    return students
+
+def validate_students_data(students):
+    add_students_loop(students)

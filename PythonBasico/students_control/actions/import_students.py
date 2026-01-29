@@ -1,9 +1,8 @@
 import os
 from data.read_students import load_students_from_csv
-from data.overwrite_students import overwrite_students_to_csv
 
 
-def import_students():
+def import_students(students):
     filename = input("Enter file name to import (example: backup.csv): ").strip()
 
     if not filename.endswith(".csv"):
@@ -13,11 +12,12 @@ def import_students():
         print("That file does not exist.")
         return
 
-    students = load_students_from_csv(filename)
+    loaded_students = load_students_from_csv(filename)
 
-    if not students:
+    if not loaded_students:
         print("The file is empty or invalid.")
         return
 
-    overwrite_students_to_csv(students, "students.csv")
-    print("Data imported successfully!")
+    students.clear()
+    students.extend(loaded_students)
+    print("Data imported into memory successfully")

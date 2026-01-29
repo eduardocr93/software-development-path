@@ -1,10 +1,7 @@
-from data.read_students import load_students_from_csv
-
-def show_students():
-    students = load_students_from_csv()
+def show_students(students):
 
     if not students:
-        print("No students found.")
+        print("No students in memory. Add or import first.")
         return
 
     print("\n===== STUDENT LIST =====")

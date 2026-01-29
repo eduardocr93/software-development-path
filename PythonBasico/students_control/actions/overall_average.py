@@ -1,6 +1,3 @@
-from data.read_students import load_students_from_csv
-
-
 def calculate_average(student):
     return (
         float(student["Spanish"]) +
@@ -10,11 +7,10 @@ def calculate_average(student):
     ) / 4
 
 
-def show_overall_average():
-    students = load_students_from_csv()
+def show_overall_average(students):
 
     if not students:
-        print("No students found.")
+        print("No students in memory. Add or import first.")
         return
 
     total = 0
