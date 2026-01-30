@@ -3,8 +3,8 @@ from actions.add_students import validate_students_data
 from actions.show_students import show_students
 from actions.top_students import show_top_3_students
 from actions.overall_average import show_overall_average
-from actions.export_students import export_students
-from actions.import_students import import_students
+from data.export_students import export_students
+from data.import_students import import_students
 from actions.delete_students import delete_students
 from actions.failed_students import show_failed_students
 
