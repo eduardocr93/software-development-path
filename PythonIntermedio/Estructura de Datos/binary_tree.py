@@ -31,14 +31,15 @@ class BinaryTree:
         if self.root is None:
             print("Tree is empty.")
         else:
-            print("Binary Tree (In-Order Traversal):")
-            self._print_in_order(self.root)
+            self._print_structure(self.root, 0)
 
-    def _print_in_order(self, node):
+    def _print_structure(self, node, level):
         if node is not None:
-            self._print_in_order(node.left)
-            print(node.value)
-            self._print_in_order(node.right)
+            self._print_structure(node.right, level + 1)
+
+            print("    " * level + str(node.value))
+
+            self._print_structure(node.left, level + 1)
 
 tree = BinaryTree()
 
