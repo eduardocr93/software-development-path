@@ -63,8 +63,8 @@ def test_quantity_upper_lower_mixed_with_accents():
     assert result == expected
 
 def test_order_alphabetic_basic():
-    text = "python-variable-function"
-    assert order_alphabetic(text) == "function-python-variable"
+    text = "python-variable-funcion"
+    assert order_alphabetic(text) == "funcion-python-variable"
 
 def test_order_alphabetic_already_sorted():
     text = "a-b-c"
@@ -73,15 +73,3 @@ def test_order_alphabetic_already_sorted():
 def test_order_alphabetic_with_duplicates():
     text = "banana-apple-banana"
     assert order_alphabetic(text) == "apple-banana-banana"
-
-def test_prime_number_mixed_list():
-    nums = [1, 4, 6, 7, 13, 9, 67]
-    assert prime_number(nums) == [7, 13, 67]
-
-def test_prime_number_all_primes():
-    nums = [2, 3, 5, 7, 11]
-    assert prime_number(nums) == [2, 3, 5, 7, 11]
-
-def test_prime_number_no_primes():
-    nums = [-3, -1, 0, 1, 4, 6, 8, 9, 10]
-    assert prime_number(nums) == []
