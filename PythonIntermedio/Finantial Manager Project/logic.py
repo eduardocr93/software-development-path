@@ -43,23 +43,29 @@ class FinanceManager:
             raise ValueError("Date cannot be in the future.")
     
     def add_transaction(self, date, title, amount, category, transaction_type):
+
         if not self.categories:
-            raise ValueError("No categories available")
-        
+            raise ValueError("No categories available.")
+
         self.validate_date(date)
+
+        if not title or not title.strip():
+            raise ValueError("Title cannot be empty.")
+
+        title = title.strip()
 
         if category not in self.categories:
             raise ValueError("Category does not exist.")
-        
-        if transaction_type not in ["Income","Expense"]:
+
+        if transaction_type not in ["Income", "Expense"]:
             raise ValueError("Invalid transaction type.")
-        
+
         if amount <= 0:
             raise ValueError("Amount must be greater than zero.")
-        
+
         if transaction_type == "Expense":
             amount = -abs(amount)
-        
+
         transaction = Transaction(date, title, amount, category, transaction_type)
         self.transactions.append(transaction)
     
