@@ -1,0 +1,8 @@
+Date,Title,Amount,Category,Type
+28/02/2026,Papajohns,-5000.0,Comida,Expense
+01/02/2026,Viaje Colombia,11300.0,Viajes,Income
+
+Totals
+Income,11300.0
+Expense,5000.0
+Balance,6300.0
