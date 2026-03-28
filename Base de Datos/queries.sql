@@ -11,7 +11,7 @@ CREATE TABLE productos (
     marca TEXT
 );
 
--- FACTURAS (modificada como pide el ejercicio)
+-- FACTURAS
 CREATE TABLE facturas (
     numero_factura INTEGER PRIMARY KEY AUTOINCREMENT,
     fecha_compra DATE NOT NULL,
