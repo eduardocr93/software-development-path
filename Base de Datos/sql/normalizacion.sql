@@ -87,15 +87,18 @@ CREATE TABLE orden_detalle (
 --
 -- Solución: separar seguros
 
+CREATE TABLE modelos (
+    modelo_id INTEGER PRIMARY KEY,
+    marca TEXT,
+    modelo TEXT
+);
 
-
--- Información única del carro
 CREATE TABLE vehiculos (
     vin TEXT PRIMARY KEY,
-    marca TEXT,
-    modelo TEXT,
+    modelo_id INTEGER,
     anio INTEGER,
-    color TEXT
+    color TEXT,
+    FOREIGN KEY (modelo_id) REFERENCES modelos(modelo_id)
 );
 
 -- Información de personas
@@ -114,10 +117,22 @@ CREATE TABLE vehiculo_propietario (
     FOREIGN KEY (owner_id) REFERENCES propietarios(owner_id)
 );
 
--- Información del seguro separada
-CREATE TABLE seguros (
+CREATE TABLE companias (
+    compania_id INTEGER PRIMARY KEY,
+    nombre TEXT
+);
+
+CREATE TABLE tipos_seguro (
+    tipo_id INTEGER PRIMARY KEY,
+    descripcion TEXT
+);
+
+CREATE TABLE polizas (
     policy_id TEXT PRIMARY KEY,
-    compania TEXT
+    compania_id INTEGER,
+    tipo_id INTEGER,
+    FOREIGN KEY (compania_id) REFERENCES companias(compania_id),
+    FOREIGN KEY (tipo_id) REFERENCES tipos_seguro(tipo_id)
 );
 
 -- Relaciona carro con su póliza
@@ -126,7 +141,7 @@ CREATE TABLE vehiculo_seguro (
     policy_id TEXT,
     PRIMARY KEY (vin, policy_id),
     FOREIGN KEY (vin) REFERENCES vehiculos(vin),
-    FOREIGN KEY (policy_id) REFERENCES seguros(policy_id)
+    FOREIGN KEY (policy_id) REFERENCES polizas(policy_id)
 );
 
 INSERT INTO clientes (customer_id, nombre, telefono) VALUES
@@ -158,10 +173,16 @@ INSERT INTO orden_detalle (order_id, item_id, cantidad, solicitud_especial) VALU
 (3, 105, 1, 'No croutons'),
 (4, 106, 1, 'None');
 
-INSERT INTO vehiculos (vin, marca, modelo, anio, color) VALUES
-('1HGCM82633A', 'Honda', 'Accord', 2003, 'Silver'),
-('5J6RM4H79EL', 'Honda', 'CR-V', 2014, 'Blue'),
-('1G1RA6EH1FU', 'Chevrolet', 'Volt', 2015, 'Red');
+INSERT INTO modelos (modelo_id, marca, modelo) VALUES
+(1, 'Honda', 'Accord'),
+(2, 'Honda', 'CR-V'),
+(3, 'Chevrolet', 'Volt');
+
+
+INSERT INTO vehiculos (vin, modelo_id, anio, color) VALUES
+('1HGCM82633A', 1, 2003, 'Silver'),
+('5J6RM4H79EL', 2, 2014, 'Blue'),
+('1G1RA6EH1FU', 3, 2015, 'Red');
 
 
 INSERT INTO propietarios (owner_id, nombre, telefono) VALUES
@@ -176,13 +197,24 @@ INSERT INTO vehiculo_propietario (vin, owner_id) VALUES
 ('5J6RM4H79EL', 103),
 ('1G1RA6EH1FU', 104);
 
+INSERT INTO companias (compania_id, nombre) VALUES
+(1, 'ABC Insurance'),
+(2, 'XYZ Insurance'),
+(3, 'DEF Insurance'),
+(4, 'GHI Insurance');
 
-INSERT INTO seguros (policy_id, compania) VALUES
-('POL12345', 'ABC Insurance'),
-('POL54321', 'XYZ Insurance'),
-('POL67890', 'DEF Insurance'),
-('POL98765', 'GHI Insurance');
 
+INSERT INTO tipos_seguro (tipo_id, descripcion) VALUES
+(1, 'Seguro completo'),
+(2, 'Seguro contra robo'),
+(3, 'Seguro contra choque');
+
+
+INSERT INTO polizas (policy_id, compania_id, tipo_id) VALUES
+('POL12345', 1, 1),
+('POL54321', 2, 2),
+('POL67890', 3, 1),
+('POL98765', 4, 3);
 
 INSERT INTO vehiculo_seguro (vin, policy_id) VALUES
 ('1HGCM82633A', 'POL12345'),
