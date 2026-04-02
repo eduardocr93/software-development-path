@@ -64,7 +64,7 @@ INSERT INTO Rents VALUES
 
 SELECT Books.Name, Authors.Name
 FROM Books
-INNER JOIN Authors ON Books.Author = Authors.ID;
+LEFT JOIN Authors ON Books.Author = Authors.ID;
 
 SELECT *
 FROM Books
