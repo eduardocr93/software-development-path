@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.user_service import create_user, list_users
+from services.user_service import create_user, list_users, update_user_status
 
 user_bp = Blueprint('user_bp', __name__)
 
@@ -18,6 +18,9 @@ def list_users_route():
 @user_bp.route('/users/<int:user_id>/status', methods=['PUT'])
 def update_user_status_route(user_id):
     data = request.json
-    from services.user_service import update_user_status
-    update_user_status(user_id, data['status'])
-    return jsonify({"message": "status updated"}), 200
+    status = data.get('status')
+    if not status:
+        return jsonify({"error": "Campo 'status' requerido"}), 400
+    update_user_status(user_id, status)
+    return jsonify({"message": "Estado actualizado"}), 200
+

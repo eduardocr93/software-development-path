@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.rental_service import create_rental, list_rentals, complete_rental
+from services.rental_service import create_rental, list_rentals, update_rental_status
 
 rental_bp = Blueprint('rental_bp', __name__)
 
@@ -15,7 +15,15 @@ def list_rentals_route():
     rentals = list_rentals(filters)
     return jsonify(rentals)
 
-@rental_bp.route('/rentals/<int:rental_id>/complete', methods=['PUT'])
-def complete_rental_route(rental_id):
-    complete_rental(rental_id)
-    return jsonify({"message": "rental completed"}), 200
+@rental_bp.route('/rentals/<int:rental_id>/status', methods=['PUT'])
+def update_rental_status_route(rental_id):
+    data = request.json
+    status = data.get('status')
+    if not status:
+        return jsonify({"error": "Campo 'status' requerido"}), 400
+    result = update_rental_status(rental_id, status)
+    if "error" in result:
+        return jsonify(result), 404
+    return jsonify(result), 200
+
+

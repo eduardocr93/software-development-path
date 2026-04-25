@@ -44,3 +44,19 @@ def complete_rental(rental_id):
     conn.commit()
     cur.close()
     conn.close()
+
+def update_rental_status(rental_id, status):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE lyfter_car_rental.rentals SET status=%s WHERE id=%s RETURNING id", (status, rental_id))
+    result = cur.fetchone()
+    if not result:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        return {"error": "Rental not found"}
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"message": "status updated"}
+

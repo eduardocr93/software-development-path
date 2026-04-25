@@ -1,17 +1,16 @@
 from db import get_connection
 
 def create_user(data):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO lyfter_car_rental.users (name, email, username, password, birth_date, status)
-        VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
-    """, (data['name'], data['email'], data['username'], data['password'], data['birth_date'], 'active'))
-    user_id = cur.fetchone()[0]
-    conn.commit()
-    cur.close()
-    conn.close()
-    return user_id
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO lyfter_car_rental.users (name, email, username, password, birth_date, status)
+                VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
+            """, (data['name'], data['email'], data['username'], data['password'], data['birth_date'], 'active'))
+            user_id = cur.fetchone()[0]
+            conn.commit()
+            return user_id
+
 
 def list_users(filters):
     query = "SELECT * FROM lyfter_car_rental.users WHERE TRUE"
