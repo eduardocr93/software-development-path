@@ -1,0 +1,107 @@
+{
+  "info": {
+    "name": "Lyfter Car Rental API",
+    "_postman_id": "12345678-abcd-efgh-ijkl-987654321",
+    "description": "Colección para probar la API de alquiler de autos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juan Pérez\",\n  \"email\": \"juan@example.com\",\n  \"username\": \"juanp\",\n  \"password\": \"1234\",\n  \"birth_date\": \"1990-05-10\"\n}"
+            },
+            "url": { "raw": "http://localhost:5000/users", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["users"] }
+          }
+        },
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:5000/users?username=juanp", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["users"], "query": [{ "key": "username", "value": "juanp" }] }
+          }
+        },
+        {
+          "name": "Cambiar estado usuario",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"moroso\" }" },
+            "url": { "raw": "http://localhost:5000/users/1/status", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["users", "1", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Automóviles",
+      "item": [
+        {
+          "name": "Crear automóvil",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Toyota\",\n  \"model\": \"Corolla\",\n  \"year\": 2020\n}"
+            },
+            "url": { "raw": "http://localhost:5000/cars", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["cars"] }
+          }
+        },
+        {
+          "name": "Listar autos disponibles",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:5000/cars?status=available", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["cars"], "query": [{ "key": "status", "value": "available" }] }
+          }
+        },
+        {
+          "name": "Cambiar estado auto",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"maintenance\" }" },
+            "url": { "raw": "http://localhost:5000/cars/1/status", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["cars", "1", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alquileres",
+      "item": [
+        {
+          "name": "Crear alquiler",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"car_id\": 1\n}"
+            },
+            "url": { "raw": "http://localhost:5000/rentals", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["rentals"] }
+          }
+        },
+        {
+          "name": "Listar alquileres",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:5000/rentals?status=ongoing", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["rentals"], "query": [{ "key": "status", "value": "ongoing" }] }
+          }
+        },
+        {
+          "name": "Completar alquiler",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "http://localhost:5000/rentals/1/complete", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["rentals", "1", "complete"] }
+          }
+        }
+      ]
+    }
+  ]
+}
