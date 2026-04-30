@@ -12,8 +12,7 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
 
-    # Relaciones
-    addresses = relationship("Address", back_populates="user")
+    addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")
     cars = relationship("Car", back_populates="user")
 
 class Address(Base):
