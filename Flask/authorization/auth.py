@@ -34,28 +34,13 @@ def token_required(f):
 
 def admin_required(f):
 
+    @token_required
     @wraps(f)
     def decorated(*args, **kwargs):
 
-        token = request.headers.get("Authorization")
-
-        if token is None:
-
-            return Response(status=401)
-
-        token = token.replace("Bearer ", "")
-
-        decoded = jwt_manager.decode(token)
-
-        if decoded is None:
-
-            return Response(status=401)
-
-        if decoded["role"] != "admin":
+        if request.user["role"] != "admin":
 
             return Response(status=403)
-
-        request.user = decoded
 
         return f(*args, **kwargs)
 
