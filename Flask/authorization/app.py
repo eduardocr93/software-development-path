@@ -31,7 +31,7 @@ def register():
 
             return Response(status=400)
 
-        role = data.get("role", "user")
+        role = "user"
 
         result = db_manager.insert_user(
             data.get("username"),
@@ -166,6 +166,7 @@ def get_products():
                 "id": product[0],
                 "nombre": product[1],
                 "precio": product[2],
+                "fecha_entrada": product[3],
                 "cantidad": product[4]
             })
 
@@ -185,6 +186,14 @@ def update_product(id):
     try:
 
         data = request.get_json()
+
+        if (
+            data.get("nombre") is None or
+            data.get("precio") is None or
+            data.get("cantidad") is None
+        ):
+
+            return Response(status=400)
 
         db_manager.update_product(
             id,
