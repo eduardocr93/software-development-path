@@ -3,12 +3,14 @@ from flask import Flask, request, jsonify, Response
 from auth import token_required, admin_required
 from db import DB_Manager
 from jwt_manager import JWT_Manager
+from redis_manager import RedisManager
 
 app = Flask("authorization-service")
 
 db_manager = DB_Manager()
 
 jwt_manager = JWT_Manager()
+redis_manager = RedisManager()
 
 
 @app.route("/liveness")
@@ -140,6 +142,7 @@ def create_product():
             data.get("precio"),
             data.get("cantidad")
         )
+        redis_manager.delete("products")
 
         return Response(status=201)
 
@@ -156,6 +159,12 @@ def get_products():
 
     try:
 
+        cached_products = redis_manager.get("products")
+
+        if cached_products is not None:
+
+            return jsonify(cached_products)
+
         products = db_manager.get_products()
 
         result = []
@@ -166,9 +175,11 @@ def get_products():
                 "id": product[0],
                 "nombre": product[1],
                 "precio": product[2],
-                "fecha_entrada": product[3],
+                "fecha_entrada": str(product[3]),
                 "cantidad": product[4]
             })
+
+        redis_manager.set("products", result)
 
         return jsonify(result)
 
@@ -178,6 +189,44 @@ def get_products():
 
         return Response(status=500)
 
+
+@app.route('/products/<id>', methods=['GET'])
+@token_required
+def get_product(id):
+
+    try:
+
+        cache_key = f"product:{id}"
+
+        cached_product = redis_manager.get(cache_key)
+
+        if cached_product is not None:
+
+            return jsonify(cached_product)
+
+        product = db_manager.get_product_by_id(id)
+
+        if product is None:
+
+            return Response(status=404)
+
+        result = {
+            "id": product[0],
+            "nombre": product[1],
+            "precio": product[2],
+            "fecha_entrada": str(product[3]),
+            "cantidad": product[4]
+        }
+
+        redis_manager.set(cache_key, result)
+
+        return jsonify(result)
+
+    except Exception as e:
+
+        print(e)
+
+        return Response(status=500)
 
 @app.route('/products/<id>', methods=['PUT'])
 @admin_required
@@ -201,6 +250,8 @@ def update_product(id):
             data.get("precio"),
             data.get("cantidad")
         )
+        redis_manager.delete("products")
+        redis_manager.delete(f"product:{id}")
 
         return Response(status=200)
 
@@ -218,6 +269,9 @@ def delete_product(id):
     try:
 
         db_manager.delete_product(id)
+
+        redis_manager.delete("products")
+        redis_manager.delete(f"product:{id}")
 
         return Response(status=200)
 
