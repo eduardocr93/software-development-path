@@ -142,6 +142,7 @@ def create_product():
             data.get("precio"),
             data.get("cantidad")
         )
+
         redis_manager.delete("products")
 
         return Response(status=201)
@@ -250,6 +251,7 @@ def update_product(id):
             data.get("precio"),
             data.get("cantidad")
         )
+        
         redis_manager.delete("products")
         redis_manager.delete(f"product:{id}")
 
@@ -322,6 +324,9 @@ def buy_product():
         if not success:
 
             return Response(status=400)
+        
+        redis_manager.delete("products")
+        redis_manager.delete(f"product:{product[0]}")
 
         db_manager.create_invoice(
             request.user["id"],

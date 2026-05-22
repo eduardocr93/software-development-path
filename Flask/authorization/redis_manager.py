@@ -17,7 +17,8 @@ class RedisManager:
 
         self.redis_client.set(
             key,
-            json.dumps(value)
+            json.dumps(value),
+            ex=60
         )
 
     def get(self, key):
