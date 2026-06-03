@@ -14,10 +14,8 @@ def test_add_item_to_cart(client):
     create_cart(client, user_token)
 
     admin_token = create_admin_token(client)
-    create_product(client, admin_token, name="Cart Product", price=5000, stock=20)
-
-    products = client.get("/products/")
-    product_id = products.json[-1]["id"]
+    product_response = create_product(client, admin_token, name="Cart Product", price=5000, stock=20)
+    product_id = product_response.json["product_id"]
 
     response = add_item_to_cart(client, user_token, product_id, quantity=2)
 
@@ -41,10 +39,8 @@ def test_update_cart_item(client):
     create_cart(client, user_token)
 
     admin_token = create_admin_token(client)
-    create_product(client, admin_token, name="Update Product", price=5000, stock=20)
-
-    products = client.get("/products/")
-    product_id = products.json[-1]["id"]
+    product_response = create_product(client, admin_token, name="Update Product", price=5000, stock=20)
+    product_id = product_response.json["product_id"]
 
     add_item_to_cart(client, user_token, product_id, quantity=2)
 
@@ -68,10 +64,8 @@ def test_delete_cart_item(client):
     create_cart(client, user_token)
 
     admin_token = create_admin_token(client)
-    create_product(client, admin_token, name="Delete Product", price=5000, stock=20)
-
-    products = client.get("/products/")
-    product_id = products.json[-1]["id"]
+    product_response = create_product(client, admin_token, name="Delete Product", price=5000, stock=20)
+    product_id = product_response.json["product_id"]
 
     add_item_to_cart(client, user_token, product_id, quantity=2)
 
@@ -103,10 +97,8 @@ def test_add_item_invalid_quantity(client):
     create_cart(client, user_token)
 
     admin_token = create_admin_token(client)
-    create_product(client, admin_token, name="Invalid Quantity Product", price=5000, stock=20)
-
-    products = client.get("/products/")
-    product_id = products.json[-1]["id"]
+    product_response = create_product(client, admin_token, name="Invalid Quantity Product", price=5000, stock=20)
+    product_id = product_response.json["product_id"]
 
     response = add_item_to_cart(client, user_token, product_id, quantity=-1)
 
@@ -118,10 +110,8 @@ def test_update_item_invalid_quantity(client):
     create_cart(client, user_token)
 
     admin_token = create_admin_token(client)
-    create_product(client, admin_token, name="Update Invalid Quantity", price=5000, stock=20)
-
-    products = client.get("/products/")
-    product_id = products.json[-1]["id"]
+    product_response = create_product(client, admin_token, name="Update Invalid Quantity", price=5000, stock=20)
+    product_id = product_response.json["product_id"]
 
     add_item_to_cart(client, user_token, product_id, quantity=1)
 

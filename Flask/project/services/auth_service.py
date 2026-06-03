@@ -3,7 +3,6 @@ from config.database import db
 from exceptions import BadRequestError, ConflictError, UnauthorizedError
 from services.validation import (
     validate_email,
-    validate_json,
     validate_required_string,
     validate_role
 )
@@ -18,11 +17,13 @@ class AuthService:
     @staticmethod
     def register_user(data):
 
-        validate_json(data)
         validate_required_string(data, "name")
         validate_email(data)
         validate_required_string(data, "password")
         validate_role(data)
+
+        if data.get("role") == "admin":
+            raise BadRequestError("Cannot register an admin user")
 
         existing_user = User.query.filter_by(
             email=data["email"]
@@ -34,7 +35,7 @@ class AuthService:
         user = User(
             name=data["name"],
             email=data["email"],
-            role=data.get("role", "client")
+            role="client"
         )
 
         user.set_password(
@@ -51,7 +52,6 @@ class AuthService:
     @staticmethod
     def login_user(data):
 
-        validate_json(data)
         validate_email(data)
         validate_required_string(data, "password")
 

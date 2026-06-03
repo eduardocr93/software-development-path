@@ -12,6 +12,7 @@ from flask_jwt_extended import (
 from services.cart_service import (
     CartService
 )
+from services.validation import validate_json
 
 cart_bp = Blueprint(
     "carts",
@@ -69,6 +70,7 @@ def add_item():
     )
 
     request_data = request.get_json(silent=True)
+    validate_json(request_data)
 
     response, status = (
         CartService.add_item(
@@ -86,10 +88,15 @@ def add_item():
 @jwt_required()
 def update_item(item_id):
 
+    user_id = int(
+        get_jwt_identity()
+    )
     request_data = request.get_json(silent=True)
+    validate_json(request_data)
 
     response, status = (
         CartService.update_item(
+            user_id,
             item_id,
             request_data
         )
@@ -104,8 +111,13 @@ def update_item(item_id):
 @jwt_required()
 def delete_item(item_id):
 
+    user_id = int(
+        get_jwt_identity()
+    )
+
     response, status = (
         CartService.delete_item(
+            user_id,
             item_id
         )
     )

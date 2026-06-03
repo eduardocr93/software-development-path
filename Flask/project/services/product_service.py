@@ -3,7 +3,6 @@ from config.database import db
 from config.cache import cache
 from exceptions import BadRequestError, NotFoundError
 from services.validation import (
-    validate_json,
     validate_number,
     validate_integer,
     validate_optional_string,
@@ -72,7 +71,6 @@ class ProductService:
     @staticmethod
     def create_product(data):
 
-        validate_json(data)
         validate_required_string(data, "name")
         validate_number(data, "price", min_value=0)
         validate_integer(data, "stock", min_value=0)
@@ -92,12 +90,13 @@ class ProductService:
 
         cache.delete("products_all")
 
-        return {"message": "Product created successfully"}, 201
+        return {
+            "message": "Product created successfully",
+            "product_id": product.id
+        }, 201
 
     @staticmethod
     def update_product(product_id, data):
-
-        validate_json(data)
 
         if not data:
             raise BadRequestError("No update data provided")

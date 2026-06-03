@@ -1,7 +1,7 @@
 from config.database import db
 from exceptions import BadRequestError, NotFoundError
+from sqlalchemy.orm import joinedload
 from services.validation import (
-    validate_json,
     validate_integer
 )
 
@@ -30,7 +30,9 @@ class CartService:
     @staticmethod
     def get_active_cart(user_id):
 
-        cart = Cart.query.filter_by(
+        cart = Cart.query.options(
+            joinedload(Cart.items).joinedload(CartItem.product)
+        ).filter_by(
             user_id=user_id,
             status="ACTIVE"
         ).first()
@@ -72,7 +74,6 @@ class CartService:
     @staticmethod
     def add_item(user_id, data):
 
-        validate_json(data)
         validate_integer(data, "product_id", min_value=1)
         validate_integer(data, "quantity", min_value=1)
 
@@ -118,14 +119,13 @@ class CartService:
         }, 201
 
     @staticmethod
-    def update_item(item_id, data):
+    def update_item(user_id, item_id, data):
 
-        validate_json(data)
-
-        item = db.session.get(
-            CartItem,
-            item_id
-        )
+        item = CartItem.query.join(Cart).filter(
+            CartItem.id == item_id,
+            Cart.user_id == user_id,
+            Cart.status == "ACTIVE"
+        ).first()
 
         if not item:
             raise NotFoundError("Item not found")
@@ -141,12 +141,13 @@ class CartService:
         }, 200
 
     @staticmethod
-    def delete_item(item_id):
+    def delete_item(user_id, item_id):
 
-        item = db.session.get(
-            CartItem,
-            item_id
-        )
+        item = CartItem.query.join(Cart).filter(
+            CartItem.id == item_id,
+            Cart.user_id == user_id,
+            Cart.status == "ACTIVE"
+        ).first()
 
         if not item:
             raise NotFoundError("Item not found")

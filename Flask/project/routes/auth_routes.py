@@ -7,6 +7,7 @@ from flask import (
 from services.auth_service import (
     AuthService
 )
+from services.validation import validate_json
 from decorators.role_required import admin_required
 
 auth_bp = Blueprint(
@@ -22,6 +23,7 @@ auth_bp = Blueprint(
 def register():
 
     request_data = request.get_json(silent=True)
+    validate_json(request_data)
 
     response, status = (
         AuthService.register_user(
@@ -39,6 +41,7 @@ def register():
 def login():
 
     request_data = request.get_json(silent=True)
+    validate_json(request_data)
 
     response, status = (
         AuthService.login_user(

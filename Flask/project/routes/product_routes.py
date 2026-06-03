@@ -7,6 +7,7 @@ from flask import (
 from services.product_service import (
     ProductService
 )
+from services.validation import validate_json
 
 from decorators.role_required import (
     admin_required
@@ -51,6 +52,7 @@ def get_product(product_id):
 def create_product():
 
     request_data = request.get_json(silent=True)
+    validate_json(request_data)
 
     response, status = (
         ProductService.create_product(
@@ -68,6 +70,7 @@ def create_product():
 def update_product(product_id):
 
     request_data = request.get_json(silent=True)
+    validate_json(request_data)
 
     response, status = (
         ProductService.update_product(

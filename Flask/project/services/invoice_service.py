@@ -1,12 +1,14 @@
 from config.database import db
+from config.cache import cache
 from exceptions import BadRequestError, ForbiddenError, NotFoundError
+from sqlalchemy.orm import joinedload
 from uuid import uuid4
 from services.validation import (
-    validate_json,
     validate_required_string
 )
 
 from models.cart import Cart
+from models.cart_item import CartItem
 from models.invoice import Invoice
 from models.invoice_item import InvoiceItem
 from models.product import Product
@@ -17,11 +19,12 @@ class InvoiceService:
     @staticmethod
     def checkout(user_id, data):
 
-        validate_json(data)
         validate_required_string(data, "billing_address")
         validate_required_string(data, "payment_method")
 
-        cart = Cart.query.filter_by(
+        cart = Cart.query.options(
+            joinedload(Cart.items).joinedload(CartItem.product)
+        ).filter_by(
             user_id=user_id,
             status="ACTIVE"
         ).first()
@@ -57,6 +60,8 @@ class InvoiceService:
         db.session.add(invoice)
         db.session.flush()
 
+        invalidated_products = set()
+
         for item in cart.items:
 
             invoice_item = InvoiceItem(
@@ -73,6 +78,11 @@ class InvoiceService:
             db.session.add(invoice_item)
 
             item.product.stock -= item.quantity
+            invalidated_products.add(item.product_id)
+
+        cache.delete("products_all")
+        for product_id in invalidated_products:
+            cache.delete(f"product_{product_id}")
 
         cart.status = "COMPLETED"
 
@@ -111,10 +121,11 @@ class InvoiceService:
         user_id
     ):
 
-        invoice = db.session.get(
-            Invoice,
-            invoice_id
-        )
+        invoice = Invoice.query.options(
+            joinedload(Invoice.items).joinedload(InvoiceItem.product)
+        ).filter_by(
+            id=invoice_id
+        ).first()
 
         if not invoice:
             raise NotFoundError("Invoice not found")
@@ -147,16 +158,19 @@ class InvoiceService:
     @staticmethod
     def refund_invoice(invoice_id):
 
-        invoice = db.session.get(
-            Invoice,
-            invoice_id
-        )
+        invoice = Invoice.query.options(
+            joinedload(Invoice.items)
+        ).filter_by(
+            id=invoice_id
+        ).first()
 
         if not invoice:
             raise NotFoundError("Invoice not found")
 
         if invoice.status == "REFUNDED":
             raise BadRequestError("Invoice already refunded")
+
+        invalidated_products = set()
 
         for item in invoice.items:
 
@@ -166,6 +180,11 @@ class InvoiceService:
             )
 
             product.stock += item.quantity
+            invalidated_products.add(item.product_id)
+
+        cache.delete("products_all")
+        for product_id in invalidated_products:
+            cache.delete(f"product_{product_id}")
 
         invoice.status = "REFUNDED"
 

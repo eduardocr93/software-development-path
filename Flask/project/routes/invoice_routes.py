@@ -1,6 +1,7 @@
 from flask import (Blueprint,request,jsonify)
 from flask_jwt_extended import (jwt_required,get_jwt_identity)
 from services.invoice_service import (InvoiceService)
+from services.validation import validate_json
 from decorators.role_required import (admin_required)
 
 
@@ -13,6 +14,7 @@ def checkout():
     user_id = int(get_jwt_identity())
 
     request_data = request.get_json(silent=True)
+    validate_json(request_data)
 
     response, status = (InvoiceService.checkout(user_id,request_data))
 

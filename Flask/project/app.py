@@ -12,6 +12,7 @@ from routes.auth_routes import auth_bp
 from routes.product_routes import product_bp
 from routes.cart_routes import cart_bp
 from routes.invoice_routes import invoice_bp
+from routes.user_routes import user_bp
 
 # Models
 from models.user import User
@@ -67,6 +68,11 @@ app.register_blueprint(
 app.register_blueprint(
     invoice_bp,
     url_prefix="/invoices"
+)
+
+app.register_blueprint(
+    user_bp,
+    url_prefix="/users"
 )
 
 if __name__ == "__main__":
