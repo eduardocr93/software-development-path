@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <form action="https://dummyjson.com/test" method="POST">
+    <h1>Votaciones Presidenciales</h1>
+    <p>Ingrese la siguiente información:</p>
+    <label for="first_name">Nombre Completo</label><br />
+    <input type="text" id="nombre" name="nombre" /><br />
+    <label for="last_name">Correo</label><br />
+    <input type="text" id="correo" name="correo" /><br />
+    <label for="email">Num. de Identificación</label><br />
+    <input type="text" id="identificacion" name="identificacion" /><br />
+    <label for="email">Telefono</label><br />
+    <input type="text" id="telefono" name="telefono" /><br /><br /><br />
+    <label for="candidato">Elige el candidato:</label>
+    <select id="votacion" name="votacion">
+      <option value="cand1">Candidato #1</option>
+      <option value="cand2">Candidato #2</option>
+      <option value="Cand3">Candidato #3</option>
+    </select>
+    <button
+      type="button"
+      onclick="window.location.href = 'https://www.google.com'"
+    >
+      Confirmar
+    </button>
+  </form>
+</html>
