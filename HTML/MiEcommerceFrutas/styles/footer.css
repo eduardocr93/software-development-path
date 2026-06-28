@@ -1,0 +1,35 @@
+.footer {
+  background-color: #fff5e6;
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid #ddd;
+  max-width: 1150px;   
+  margin: 2rem auto;
+  border-radius: 8px;
+}
+
+.footer input {
+  display: block;       
+  margin: 0 auto 1rem;  
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-width: 300px;    
+}
+
+.send-button {
+  display: block;       
+  margin: 0 auto;      
+  background-color: #000; 
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.send-button:hover {
+  background-color: #333; 
+}
