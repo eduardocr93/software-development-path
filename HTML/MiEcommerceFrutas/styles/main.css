@@ -1,0 +1,35 @@
+@import url(header.css);
+@import url(banner.css);
+@import url(catalog.css);
+@import url(footer.css);
+
+html {
+  font-family: 'Poppins', Arial, sans-serif;
+  color: #333;
+}
+
+body {
+  margin: 0;
+  background-color: #fff;
+}
+
+.contain {
+  padding: 0 10%;
+}
+
+.buy-button:hover,
+.send-button:hover {
+  background-color: #e66a00;
+}
+
+h2, h3 {
+  margin: 0.5rem 0;
+}
+
+input[type="email"],
+input[type="text"] {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

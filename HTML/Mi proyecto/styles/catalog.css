@@ -1,0 +1,97 @@
+.catalog {
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: start;
+}
+
+.catalog p {
+  margin: 0;
+}
+
+.catalog .title-container {
+  margin: 1rem 0;
+}
+
+.catalog .main-title {
+  font-size: 1.5rem;
+}
+
+.catalog .sub-title {
+  font-size: 0.8rem;
+}
+
+.catalog .product-rows {
+  display: flex;
+
+  flex-direction: row;
+
+  flex-wrap: wrap;
+
+  justify-content: space-between;
+}
+
+.catalog .product {
+  width: 23%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  margin: 0 0.7rem 1rem 0;
+}
+
+.catalog .product .product-image {
+  width: 100%;
+}
+
+.catalog .product .product-info {
+  padding: 0 0.5rem;
+
+  display: flex;
+
+  flex-direction: column;
+
+  width: 100%;
+}
+
+.catalog .product .product-info .main-row {
+  display: flex;
+
+  justify-content: space-between;
+}
+
+.catalog .product .product-info .info-name {
+  font-weight: bold;
+}
+
+.catalog .product .product-info .add-button {
+  border: none;
+
+  background: none;
+
+  cursor: pointer;
+}
+
+.catalog .product .product-info .price {
+  margin-top: 1rem;
+}
+
+.catalog .product {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.catalog .product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.catalog .product .product-image {
+  width: 100%;
+  height: 250px;       
+  object-fit: cover;     
+  border-radius: 4px;    
+}
