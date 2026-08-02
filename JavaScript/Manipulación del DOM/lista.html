@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista dinámica</title>
+</head>
+<body>
+  <h1>Mi lista ordenada</h1>
+
+  <ol id="miLista"></ol>
+
+  <button id="btnAgregar">Agregar elemento</button>
+  <button id="btnLimpiar">Limpiar lista</button>
+
+  <script>
+    const lista = document.getElementById("miLista");
+    const btnAgregar = document.getElementById("btnAgregar");
+    const btnLimpiar = document.getElementById("btnLimpiar");
+
+    let contador = 1;
+
+    btnAgregar.addEventListener("click", () => {
+      const nuevoItem = document.createElement("li");
+      nuevoItem.textContent = "Elemento " + contador;
+      lista.appendChild(nuevoItem);
+      contador++;
+    });
+
+    btnLimpiar.addEventListener("click", () => {
+      lista.innerHTML = "";
+      contador = 1;
+    });
+  </script>
+</body>
+</html>
