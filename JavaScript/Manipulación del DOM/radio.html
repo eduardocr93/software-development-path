@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario con radio</title>
+</head>
+<body>
+  <h1>Registro</h1>
+
+  <form>
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre"><br><br>
+
+    <label for="apellidos">Apellidos:</label>
+    <input type="text" id="apellidos" name="apellidos"><br><br>
+
+    <label for="correo">Correo:</label>
+    <input type="email" id="correo" name="correo"><br><br>
+
+    <label for="password">Contraseña:</label>
+    <input type="password" id="password" name="password"><br><br>
+
+    <p>¿Es empleado?</p>
+    <label>
+      <input type="radio" name="empleado" value="si"> Sí
+    </label>
+    <label>
+      <input type="radio" name="empleado" value="no"> No
+    </label><br><br>
+
+    <div id="campoEmpleo" style="display: none;">
+      <label for="empleo">Empleo:</label>
+      <input type="text" id="empleo" name="empleo">
+    </div>
+  </form>
+
+  <script>
+    const radios = document.getElementsByName("empleado");
+    const campoEmpleo = document.getElementById("campoEmpleo");
+
+    radios.forEach(radio => {
+      radio.addEventListener("change", () => {
+        if (radio.value === "si") {
+          campoEmpleo.style.display = "block";
+        } else {
+          campoEmpleo.style.display = "none";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
