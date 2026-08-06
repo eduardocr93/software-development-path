@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cambiar color de párrafo</title>
+  <style>
+    p {
+      padding: 1rem;
+      border: 1px solid #ccc;
+      width: 300px;
+      text-align: center;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <p id="text">Lorem ipsum dolor sit amet.</p>
+  <button id="colorBtn">Cambiar color</button>
+
+  <script>
+    const colors = ["red", "blue", "green", "yellow", "cyan", "pink"];
+
+    const paragraph = document.getElementById("text");
+    const button = document.getElementById("colorBtn");
+
+    button.addEventListener("click", () => {
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      paragraph.style.backgroundColor = randomColor;
+    });
+  </script>
+</body>
+</html>
