@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscar Usuario</title>
+</head>
+<body>
+  <h2>Buscar Usuario en ReqRes</h2>
+  <input id="userId" type="number" placeholder="Ingrese ID de usuario">
+  <button id="btnBuscar">Buscar</button>
+  <div id="resultado"></div>
+
+  <script>
+    async function buscarUsuario(id) {
+      try {
+        const response = await fetch(`https://reqres.in/api/users/${id}`);
+        if (!response.ok) throw new Error("Usuario no encontrado");
+        const data = await response.json();
+        const { first_name, last_name, email } = data.data;
+        document.getElementById("resultado").innerText =
+          `${first_name} ${last_name} - ${email}`;
+      } catch (error) {
+        document.getElementById("resultado").innerText = "❌ " + error.message;
+      }
+    }
+
+    document.getElementById("btnBuscar").addEventListener("click", () => {
+      const id = document.getElementById("userId").value;
+      buscarUsuario(id);
+    });
+  </script>
+</body>
+</html>
