@@ -1,16 +1,21 @@
+const resolvedWords = [];
+
 function delayWord(word, time) {
   return new Promise(resolve => {
-    setTimeout(() => resolve(word), time);
+    setTimeout(() => {
+      resolvedWords.push(word);
+      resolve();
+    }, time);
   });
 }
 
 const words = [
-  delayWord("dogs", 100),
-  delayWord("are", 200),
   delayWord("very", 300),
+  delayWord("Dogs", 100),
   delayWord("cute", 400),
+  delayWord("are", 200),
 ];
 
-Promise.all(words).then(result => {
-  console.log(result.join(" "));
+Promise.all(words).then(() => {
+  console.log(resolvedWords.join(" "));
 });
