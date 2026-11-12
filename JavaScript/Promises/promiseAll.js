@@ -1,9 +1,4 @@
-import fetch from "node-fetch";
-
-function getPokemon(id) {
-  return fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-    .then(res => res.json());
-}
+const getPokemon = require("./getPokemon");
 
 Promise.all([getPokemon(1), getPokemon(4), getPokemon(7)])
   .then(results => {

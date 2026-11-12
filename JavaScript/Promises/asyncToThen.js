@@ -1,5 +1,3 @@
-import fetch from "node-fetch";
-
 // Usuario existente
 fetch("https://reqres.in/api/users/2")
   .then(res => res.json())
