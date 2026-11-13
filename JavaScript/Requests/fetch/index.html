@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD con fetch</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script type="module" src="./fetch.js"></script>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <p class="eyebrow">Fetch</p>
+      <h1>Artículos deportivos</h1>
+      <a class="secondary-link" href="../index.html">← Volver a las prácticas</a>
+    </header>
+
+    <section class="card">
+      <h2>Consultar objetos · GET</h2>
+      <div class="link-list">
+        <button id="getAllButton" type="button">Consultar todos</button>
+      </div>
+      <form id="getOneForm">
+        <label>ID del artículo
+          <input name="id" required>
+        </label>
+        <button type="submit">Consultar y cargar datos</button>
+      </form>
+      <p>El artículo se cargará en los formularios PUT y PATCH.</p>
+    </section>
+
+    <section class="card">
+      <h2>Crear un artículo · POST</h2>
+      <form id="createForm">
+        <label>Nombre del artículo
+          <input name="name" value="Balón de fútbol" required>
+        </label>
+        <label>Datos adicionales (JSON)
+          <textarea name="data" required>{"marca":"Deporte","tipo":"balón","precio":25}</textarea>
+        </label>
+        <button type="submit">Crear artículo</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Reemplazar un artículo · PUT</h2>
+      <form id="putForm">
+        <label>ID del artículo
+          <input name="id" required>
+        </label>
+        <label>Nuevo nombre
+          <input name="name" required>
+        </label>
+        <label>Nuevos datos (JSON)
+          <textarea name="data" required>{"marca":"Deporte","tipo":"balón actualizado","precio":30}</textarea>
+        </label>
+        <button type="submit">Reemplazar (PUT)</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Actualizar datos · PATCH</h2>
+      <form id="patchForm">
+        <label>ID del artículo
+          <input name="id" required>
+        </label>
+        <label>Campos de datos que quieres cambiar (JSON)
+          <textarea name="data" required>{"precio":28}</textarea>
+        </label>
+        <button type="submit">Actualizar (PATCH)</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Eliminar un artículo · DELETE</h2>
+      <form id="deleteForm">
+        <label>ID del artículo
+          <input name="id" required>
+        </label>
+        <button type="submit">Eliminar artículo</button>
+      </form>
+    </section>
+
+    <section class="card" aria-live="polite">
+      <h2>Respuesta</h2>
+      <p id="message" class="message"></p>
+      <pre id="result" class="result"></pre>
+    </section>
+  </main>
+</body>
+</html>

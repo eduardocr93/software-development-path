@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio de sesión</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./auth.js"></script>
+</head>
+<body data-page="login">
+  <main class="container">
+    <header class="page-header">
+      <p class="eyebrow">Usuarios</p>
+      <h1>Iniciar sesión</h1>
+      <a class="secondary-link" href="./index.html">← Volver a las prácticas</a>
+    </header>
+    <section class="card">
+      <form id="loginForm">
+        <label>ID de usuario
+          <input name="id" autocomplete="username" required>
+        </label>
+        <label>Contraseña
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">Iniciar sesión</button>
+      </form>
+      <p id="message" class="message" role="status"></p>
+      <p>¿Todavía no tienes usuario? <a href="./register.html">Regístrate</a>.</p>
+    </section>
+  </main>
+</body>
+</html>

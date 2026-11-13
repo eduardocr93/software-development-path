@@ -1,0 +1,247 @@
+:root {
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #e7eaf2;
+  background: #10131b;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --border: #30394b;
+  --text-muted: #a4aec0;
+  --accent: #8b9cff;
+  --accent-hover: #a5b2ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(ellipse at 50% -20%, rgb(91 109 211 / 16%), transparent 55%),
+    #10131b;
+}
+
+.container {
+  width: min(900px, calc(100% - 32px));
+  margin: 48px auto;
+}
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  margin: 4px 0 8px;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.04em;
+}
+
+.page-header > p:not(.eyebrow) {
+  color: var(--text-muted);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.card {
+  margin: 18px 0;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgb(32 39 54 / 92%), rgb(25 30 41 / 96%));
+  box-shadow: 0 14px 36px rgb(0 0 0 / 18%);
+}
+
+.card h2 {
+  margin-top: 0;
+  letter-spacing: -0.02em;
+}
+
+.card > p {
+  color: var(--text-muted);
+}
+
+.card li {
+  margin: 8px 0;
+}
+
+.link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.button-link,
+button {
+  display: inline-block;
+  padding: 10px 15px;
+  border: 0;
+  border-radius: 8px;
+  background: #596ed0;
+  color: #fff;
+  font: inherit;
+  font-weight: 650;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.button-link:hover,
+button:hover {
+  background: #6d81e2;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
+}
+
+:is(a, button, input, textarea):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.secondary-link {
+  color: var(--accent);
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+}
+
+.secondary-link:hover {
+  color: var(--accent-hover);
+  text-decoration-color: currentColor;
+}
+
+form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 650;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #414b60;
+  border-radius: 8px;
+  background: #121721;
+  color: #e7eaf2;
+  font: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #7d8799;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+}
+
+textarea {
+  min-height: 110px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.message {
+  min-height: 1.5em;
+  margin: 14px 0 0;
+  color: #76d6a0;
+  font-weight: 600;
+}
+
+.message.error {
+  color: #ff9292;
+}
+
+.notice {
+  padding: 14px 16px;
+  border: 1px solid #67552b;
+  border-left: 4px solid #e6b955;
+  border-radius: 8px;
+  background: #292316;
+  color: #e8d7ad;
+}
+
+.result {
+  overflow: auto;
+  min-height: 90px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #101827;
+  color: #e7edf7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.profile-item {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgb(18 23 33 / 55%);
+}
+
+.profile-item h3 {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+.profile-item p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.top-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 16px 0;
+}
+
+code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #30394b;
+  color: #d3dcff;
+}
+
+@media (max-width: 600px) {
+  .container {
+    margin: 28px auto;
+  }
+
+  .card {
+    padding: 18px;
+  }
+}
