@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./auth.js"></script>
+</head>
+<body data-page="register">
+  <main class="container">
+    <header class="page-header">
+      <p class="eyebrow">Usuarios</p>
+      <h1>Registro</h1>
+      <a class="secondary-link" href="./index.html">← Volver a las prácticas</a>
+    </header>
+    <section class="card">
+      <form id="registerForm">
+        <label>Nombre
+          <input name="name" autocomplete="name" required>
+        </label>
+        <label>Correo electrónico
+          <input name="email" type="email" autocomplete="email" required>
+        </label>
+        <label>Contraseña de práctica
+          <input name="password" type="password" autocomplete="new-password" required>
+        </label>
+        <button type="submit">Crear usuario</button>
+      </form>
+      <p id="message" class="message" role="status"></p>
+      <p>¿Ya tienes un usuario? <a href="./login.html">Inicia sesión</a>.</p>
+    </section>
+  </main>
+</body>
+</html>
