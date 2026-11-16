@@ -36,8 +36,20 @@
         <label>Nombre del artículo
           <input name="name" value="Raqueta de tenis" required>
         </label>
-        <label>Datos adicionales (JSON)
-          <textarea name="data" required>{"marca":"Deporte","tipo":"raqueta","precio":60}</textarea>
+        <label>Marca
+          <input name="marca" value="Deporte" required>
+        </label>
+        <label>Tipo de artículo
+          <input name="tipo" value="raqueta" required>
+        </label>
+        <label>Precio
+          <input name="precio" type="number" min="0" step="0.01" value="60" required>
+        </label>
+        <label>Material
+          <input name="material" value="grafito" required>
+        </label>
+        <label>Deporte
+          <input name="deporte" value="tenis" required>
         </label>
         <button type="submit">Crear artículo</button>
       </form>
@@ -52,8 +64,20 @@
         <label>Nuevo nombre
           <input name="name" required>
         </label>
-        <label>Nuevos datos (JSON)
-          <textarea name="data" required>{"marca":"Deporte","tipo":"raqueta actualizada","precio":65}</textarea>
+        <label>Marca
+          <input name="marca" value="Deporte" required>
+        </label>
+        <label>Tipo de artículo
+          <input name="tipo" value="raqueta actualizada" required>
+        </label>
+        <label>Precio
+          <input name="precio" type="number" min="0" step="0.01" value="65" required>
+        </label>
+        <label>Material
+          <input name="material" value="grafito" required>
+        </label>
+        <label>Deporte
+          <input name="deporte" value="tenis" required>
         </label>
         <button type="submit">Reemplazar (PUT)</button>
       </form>
@@ -65,8 +89,21 @@
         <label>ID del artículo
           <input name="id" required>
         </label>
-        <label>Campos de datos que quieres cambiar (JSON)
-          <textarea name="data" required>{"precio":58}</textarea>
+        <p>Completa solo los atributos que quieres cambiar. Los demás se conservarán.</p>
+        <label>Marca
+          <input name="marca" placeholder="Dejar sin cambios">
+        </label>
+        <label>Tipo de artículo
+          <input name="tipo" placeholder="Dejar sin cambios">
+        </label>
+        <label>Precio
+          <input name="precio" type="number" min="0" step="0.01" placeholder="Dejar sin cambios">
+        </label>
+        <label>Material
+          <input name="material" placeholder="Dejar sin cambios">
+        </label>
+        <label>Deporte
+          <input name="deporte" placeholder="Dejar sin cambios">
         </label>
         <button type="submit">Actualizar (PATCH)</button>
       </form>

@@ -1,5 +1,12 @@
 const API_BASE_URL = "https://api.restful-api.dev";
 
+export function mergeData(currentData, updates) {
+  const existing = currentData && typeof currentData === "object" && !Array.isArray(currentData)
+    ? currentData
+    : {};
+  return { ...existing, ...updates };
+}
+
 async function request(path, options = {}) {
   let response;
 

@@ -1,4 +1,4 @@
-import { createObject, getObjectById, patchObject } from "./api.js";
+import { createObject, getObjectById, mergeData, patchObject } from "./api.js";
 
 const SESSION_KEY = "requests-user-id";
 const message = document.querySelector("#message");
@@ -99,6 +99,11 @@ function addProfileItem(container, title, value) {
 }
 
 async function loadProfile() {
+  document.querySelector("#logoutButton").addEventListener("click", () => {
+    localStorage.removeItem(SESSION_KEY);
+    window.location.href = "./login.html";
+  });
+
   const id = localStorage.getItem(SESSION_KEY);
   if (!id) {
     window.location.replace("./login.html");
@@ -119,13 +124,13 @@ async function loadProfile() {
     }
     showMessage("Perfil cargado correctamente.");
   } catch (error) {
+    if (error.status === 404) {
+      localStorage.removeItem(SESSION_KEY);
+      window.location.replace("./login.html");
+      return;
+    }
     showMessage(explainRequestError(error), true);
   }
-
-  document.querySelector("#logoutButton").addEventListener("click", () => {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.href = "./login.html";
-  });
 }
 
 async function changePassword() {
@@ -157,7 +162,7 @@ async function changePassword() {
         return;
       }
 
-      await patchObject(id, { password: newPassword });
+      await patchObject(id, mergeData(user.data, { password: newPassword }));
       form.reset();
       if (sessionId) {
         form.elements.id.value = sessionId;

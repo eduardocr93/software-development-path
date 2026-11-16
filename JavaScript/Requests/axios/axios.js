@@ -1,61 +1,23 @@
+import { mergeData } from "../api.js";
+import {
+  fillSportsData,
+  fillSportsPatch,
+  formatObjectList,
+  readSportsPatch,
+  readSportsData,
+  runRequest,
+  showError,
+} from "../request-ui.js";
+
 const API_BASE_URL = "https://api.restful-api.dev/objects";
-const message = document.querySelector("#message");
-const result = document.querySelector("#result");
-
-function showResult(value, text) {
-  message.textContent = text;
-  message.classList.remove("error");
-  result.textContent = JSON.stringify(value, null, 2);
-}
-
-function showError(error) {
-  if (error.response?.status === 404) {
-    message.textContent = "No se encontró ningún objeto con ese ID. Verifica el ID e inténtalo de nuevo.";
-    message.classList.add("error");
-    result.textContent = "";
-    return;
-  }
-
-  if (error.response?.status === 405) {
-    message.textContent = "El API no permite esta operación con ese objeto. Puede ser un ID reservado; prueba con un objeto creado por ti mediante POST.";
-    message.classList.add("error");
-    result.textContent = "";
-    return;
-  }
-
-  const serverMessage = error.response?.data?.error || error.response?.data?.message;
-  message.textContent = serverMessage
-    ? `Error ${error.response.status}: ${serverMessage}`
-    : error.message;
-  message.classList.add("error");
-  result.textContent = "";
-}
-
-function readData(form, allowNull = false) {
-  const data = JSON.parse(new FormData(form).get("data"));
-  if ((!allowNull && !data) || (data !== null && (typeof data !== "object" || Array.isArray(data)))) {
-    throw new Error("Los datos deben ser un objeto JSON, por ejemplo: {\"color\":\"azul\"}.");
-  }
-  return data;
-}
-
-async function runRequest(action, successMessage, onSuccess) {
-  try {
-    const response = await action();
-    onSuccess?.(response.data);
-    const messageText = typeof successMessage === "function"
-      ? successMessage(response.data)
-      : successMessage;
-    showResult(response.data, messageText);
-  } catch (error) {
-    showError(error);
-  }
-}
 
 document.querySelector("#getAllButton").addEventListener("click", () => {
   runRequest(
     () => axios.get(API_BASE_URL),
-    (objects) => `Se recibieron ${objects.length} objetos. Los creados con POST se buscan por su ID.`,
+    (objects) => `Se muestran ${objects.filter((item) => item?.data != null).length} objetos con datos.`,
+    undefined,
+    (response) => response.data,
+    formatObjectList,
   );
 });
 
@@ -66,16 +28,16 @@ document.querySelector("#getOneForm").addEventListener("submit", (event) => {
     () => axios.get(`${API_BASE_URL}/${encodeURIComponent(id)}`),
     "Artículo cargado en los formularios PUT y PATCH.",
     (item) => {
-      const data = JSON.stringify(item.data ?? {}, null, 2);
       const putForm = document.querySelector("#putForm");
       putForm.elements.id.value = item.id;
       putForm.elements.name.value = item.name;
-      putForm.elements.data.value = data;
+      fillSportsData(putForm, item.data);
 
       const patchForm = document.querySelector("#patchForm");
       patchForm.elements.id.value = item.id;
-      patchForm.elements.data.value = data;
+      fillSportsPatch(patchForm, item.data);
     },
+    (response) => response.data,
   );
 });
 
@@ -85,10 +47,12 @@ document.querySelector("#createForm").addEventListener("submit", (event) => {
   try {
     const values = new FormData(form);
     const name = values.get("name").trim();
-    const data = readData(form);
+    const data = readSportsData(form);
     runRequest(
       () => axios.post(API_BASE_URL, { name, data }),
       "Artículo creado. Guarda su ID: lo necesitarás para consultarlo o modificarlo.",
+      undefined,
+      (response) => response.data,
     );
   } catch (error) {
     showError(error);
@@ -102,10 +66,12 @@ document.querySelector("#putForm").addEventListener("submit", (event) => {
     const values = new FormData(form);
     const id = values.get("id").trim();
     const name = values.get("name").trim();
-    const data = readData(form, true);
+    const data = readSportsData(form);
     runRequest(
       () => axios.put(`${API_BASE_URL}/${encodeURIComponent(id)}`, { name, data }),
       "Artículo reemplazado correctamente.",
+      undefined,
+      (response) => response.data,
     );
   } catch (error) {
     showError(error);
@@ -118,10 +84,16 @@ document.querySelector("#patchForm").addEventListener("submit", (event) => {
   try {
     const values = new FormData(form);
     const id = values.get("id").trim();
-    const data = readData(form);
+    const data = readSportsPatch(form);
     runRequest(
-      () => axios.patch(`${API_BASE_URL}/${encodeURIComponent(id)}`, { data }),
+      async () => {
+        const path = `${API_BASE_URL}/${encodeURIComponent(id)}`;
+        const current = await axios.get(path);
+        return axios.patch(path, { data: mergeData(current.data.data, data) });
+      },
       "Datos del artículo actualizados correctamente.",
+      undefined,
+      (response) => response.data,
     );
   } catch (error) {
     showError(error);
@@ -132,6 +104,11 @@ document.querySelector("#deleteForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const id = new FormData(event.currentTarget).get("id").trim();
   if (window.confirm(`¿Seguro que quieres eliminar el artículo ${id}?`)) {
-    runRequest(() => axios.delete(`${API_BASE_URL}/${encodeURIComponent(id)}`), "Artículo eliminado correctamente.");
+    runRequest(
+      () => axios.delete(`${API_BASE_URL}/${encodeURIComponent(id)}`),
+      "Artículo eliminado correctamente.",
+      undefined,
+      (response) => response.data,
+    );
   }
 });
