@@ -27,46 +27,47 @@ export function showError(error) {
 
 export function readSportsData(form) {
   const values = new FormData(form);
-  const marca = values.get("marca").trim();
-  const tipo = values.get("tipo").trim();
+  const brand = values.get("brand").trim();
+  const type = values.get("type").trim();
   const material = values.get("material").trim();
-  const deporte = values.get("deporte").trim();
-  const precioText = values.get("precio").trim();
-  const precio = Number(precioText);
+  const sport = values.get("sport").trim();
+  const priceText = values.get("price").trim();
+  const price = Number(priceText);
 
-  if (!marca || !tipo || !material || !deporte || precioText === "" || !Number.isFinite(precio) || precio < 0) {
+  if (!brand || !type || !material || !sport || priceText === "" || !Number.isFinite(price) || price < 0) {
     throw new Error("Completa los cinco atributos del artículo y usa un precio válido de cero o más.");
   }
 
-  return { marca, tipo, precio, material, deporte };
+  return { brand, type, price, material, sport };
 }
 
 export function fillSportsData(form, data = {}) {
-  form.elements.marca.value = data.marca ?? "";
-  form.elements.tipo.value = data.tipo ?? "";
-  form.elements.precio.value = data.precio ?? "";
+  data = data ?? {};
+  form.elements.brand.value = data.brand ?? "";
+  form.elements.type.value = data.type ?? "";
+  form.elements.price.value = data.price ?? "";
   form.elements.material.value = data.material ?? "";
-  form.elements.deporte.value = data.deporte ?? "";
+  form.elements.sport.value = data.sport ?? "";
 }
 
 export function readSportsPatch(form) {
   const values = new FormData(form);
   const updates = {};
 
-  for (const field of ["marca", "tipo", "material", "deporte"]) {
+  for (const field of ["brand", "type", "material", "sport"]) {
     const value = values.get(field).trim();
     if (value) {
       updates[field] = value;
     }
   }
 
-  const priceText = values.get("precio").trim();
+  const priceText = values.get("price").trim();
   if (priceText) {
     const price = Number(priceText);
     if (!Number.isFinite(price) || price < 0) {
       throw new Error("El precio debe ser un número válido de cero o más.");
     }
-    updates.precio = price;
+    updates.price = price;
   }
 
   if (Object.keys(updates).length === 0) {
@@ -77,15 +78,20 @@ export function readSportsPatch(form) {
 }
 
 export function fillSportsPatch(form, data = {}) {
-  for (const field of ["marca", "tipo", "precio", "material", "deporte"]) {
+  data = data ?? {};
+  for (const field of ["brand", "type", "price", "material", "sport"]) {
     const input = form.elements[field];
     input.value = "";
     input.placeholder = data[field] == null ? "Dejar sin cambios" : `Actual: ${data[field]}`;
   }
 }
 
+export function filterObjectsWithData(objects) {
+  return objects.filter((item) => item?.data != null);
+}
+
 export function formatObjectList(objects) {
-  const itemsWithData = objects.filter((item) => item?.data != null);
+  const itemsWithData = filterObjectsWithData(objects);
   if (itemsWithData.length === 0) {
     return "No se encontraron objetos con datos.";
   }

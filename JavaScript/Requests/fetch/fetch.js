@@ -10,6 +10,7 @@ import {
 import {
   fillSportsData,
   fillSportsPatch,
+  filterObjectsWithData,
   formatObjectList,
   readSportsPatch,
   readSportsData,
@@ -20,7 +21,7 @@ import {
 document.querySelector("#getAllButton").addEventListener("click", () => {
   runRequest(
     getObjects,
-    (objects) => `Se muestran ${objects.filter((item) => item?.data != null).length} objetos con datos.`,
+    (objects) => `Se muestran ${filterObjectsWithData(objects).length} objetos con datos.`,
     undefined,
     (value) => value,
     formatObjectList,

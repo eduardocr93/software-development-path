@@ -177,7 +177,16 @@ async function changePassword() {
 }
 
 const page = document.body.dataset.page;
-if (page === "register") register();
-if (page === "login") login();
-if (page === "profile") loadProfile();
-if (page === "change-password") changePassword();
+const sessionId = localStorage.getItem(SESSION_KEY);
+
+if (sessionId && (page === "login" || page === "register")) {
+  window.location.replace("./profile.html");
+} else if (page === "register") {
+  register();
+} else if (page === "login") {
+  login();
+} else if (page === "profile") {
+  loadProfile();
+} else if (page === "change-password") {
+  changePassword();
+}

@@ -2,6 +2,7 @@ import { mergeData } from "../api.js";
 import {
   fillSportsData,
   fillSportsPatch,
+  filterObjectsWithData,
   formatObjectList,
   readSportsPatch,
   readSportsData,
@@ -14,7 +15,7 @@ const API_BASE_URL = "https://api.restful-api.dev/objects";
 document.querySelector("#getAllButton").addEventListener("click", () => {
   runRequest(
     () => axios.get(API_BASE_URL),
-    (objects) => `Se muestran ${objects.filter((item) => item?.data != null).length} objetos con datos.`,
+    (objects) => `Se muestran ${filterObjectsWithData(objects).length} objetos con datos.`,
     undefined,
     (response) => response.data,
     formatObjectList,
