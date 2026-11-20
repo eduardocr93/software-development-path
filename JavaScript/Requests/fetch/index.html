@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD con fetch</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script type="module" src="./fetch.js"></script>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <p class="eyebrow">Fetch</p>
+      <h1>Artículos deportivos</h1>
+      <a class="secondary-link" href="../index.html">← Volver a las prácticas</a>
+    </header>
+
+    <section class="card">
+      <h2>Consultar objetos · GET</h2>
+      <div class="link-list">
+        <button id="getAllButton" type="button">Consultar todos</button>
+      </div>
+      <form id="getOneForm">
+        <label>ID del artículo
+          <input name="id" required>
+        </label>
+        <button type="submit">Consultar y cargar datos</button>
+      </form>
+      <p>El artículo se cargará en los formularios PUT y PATCH.</p>
+    </section>
+
+    <section class="card">
+      <h2>Crear un artículo · POST</h2>
+      <form id="createForm">
+        <label>Nombre del artículo
+          <input name="name" value="Balón de fútbol" required>
+        </label>
+        <label>Marca
+          <input name="brand" value="Deporte" required>
+        </label>
+        <label>Tipo de artículo
+          <input name="type" value="balón" required>
+        </label>
+        <label>Precio
+          <input name="price" type="number" min="0" step="0.01" value="25" required>
+        </label>
+        <label>Material
+          <input name="material" value="cuero sintético" required>
+        </label>
+        <label>Deporte
+          <input name="sport" value="fútbol" required>
+        </label>
+        <button type="submit">Crear artículo</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Reemplazar un artículo · PUT</h2>
+      <form id="putForm">
+        <label>ID del artículo
+          <input name="id" required>
+        </label>
+        <label>Nuevo nombre
+          <input name="name" required>
+        </label>
+        <label>Marca
+          <input name="brand" value="Deporte" required>
+        </label>
+        <label>Tipo de artículo
+          <input name="type" value="balón actualizado" required>
+        </label>
+        <label>Precio
+          <input name="price" type="number" min="0" step="0.01" value="30" required>
+        </label>
+        <label>Material
+          <input name="material" value="cuero sintético" required>
+        </label>
+        <label>Deporte
+          <input name="sport" value="fútbol" required>
+        </label>
+        <button type="submit">Reemplazar (PUT)</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Actualizar datos · PATCH</h2>
+      <form id="patchForm">
+        <label>ID del artículo
+          <input name="id" required>
+        </label>
+        <p>Completa solo los atributos que quieres cambiar. Los demás se conservarán.</p>
+        <label>Marca
+          <input name="brand" placeholder="Dejar sin cambios">
+        </label>
+        <label>Tipo de artículo
+          <input name="type" placeholder="Dejar sin cambios">
+        </label>
+        <label>Precio
+          <input name="price" type="number" min="0" step="0.01" placeholder="Dejar sin cambios">
+        </label>
+        <label>Material
+          <input name="material" placeholder="Dejar sin cambios">
+        </label>
+        <label>Deporte
+          <input name="sport" placeholder="Dejar sin cambios">
+        </label>
+        <button type="submit">Actualizar (PATCH)</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Eliminar un artículo · DELETE</h2>
+      <form id="deleteForm">
+        <label>ID del artículo
+          <input name="id" required>
+        </label>
+        <button type="submit">Eliminar artículo</button>
+      </form>
+    </section>
+
+    <section class="card" aria-live="polite">
+      <h2>Respuesta</h2>
+      <p id="message" class="message"></p>
+      <pre id="result" class="result"></pre>
+    </section>
+  </main>
+</body>
+</html>
