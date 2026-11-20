@@ -17,6 +17,33 @@ from models.product import Product
 class InvoiceService:
 
     @staticmethod
+    def get_all_invoices():
+
+        invoices = Invoice.query.options(
+            joinedload(Invoice.user)
+        ).order_by(
+            Invoice.created_at.desc()
+        ).all()
+
+        result = [
+            {
+                "id": invoice.id,
+                "invoice_number": invoice.invoice_number,
+                "customer_name": invoice.user.name,
+                "total": invoice.total,
+                "status": invoice.status,
+                "created_at": (
+                    invoice.created_at.isoformat()
+                    if invoice.created_at
+                    else None
+                )
+            }
+            for invoice in invoices
+        ]
+
+        return result, 200
+
+    @staticmethod
     def checkout(user_id, data):
 
         validate_required_string(data, "billing_address")

@@ -30,6 +30,16 @@ def get_invoices():
 
     return jsonify(response), status
 
+
+@invoice_bp.route("/admin", methods=["GET"])
+@admin_required()
+def get_all_invoices():
+
+    response, status = InvoiceService.get_all_invoices()
+
+    return jsonify(response), status
+
+
 @invoice_bp.route("/<int:invoice_id>", methods=["GET"])
 @jwt_required()
 def get_invoice(invoice_id):

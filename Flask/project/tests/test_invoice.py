@@ -1,4 +1,9 @@
 ﻿from tests.helpers import create_user_token, create_admin_token, create_product, create_cart, add_item_to_cart
+from app import app
+from config.database import db
+from models.invoice import Invoice
+from models.user import User
+from tests.helpers import register_user
 
 
 def setup_checkout(client, user_token):
@@ -11,6 +16,45 @@ def setup_checkout(client, user_token):
 
     add_item_to_cart(client, user_token, product_id, quantity=2)
     return product_id
+
+
+def test_admin_can_list_all_invoices(client):
+    admin_token = create_admin_token(client)
+    customer_email = register_user(client)
+
+    with app.app_context():
+        customer = User.query.filter_by(email=customer_email).one()
+        invoice = Invoice(
+            invoice_number="INV-ADMIN-001",
+            user_id=customer.id,
+            billing_address="San José",
+            payment_method="SINPE",
+            total=12500,
+            status="PAID",
+        )
+        db.session.add(invoice)
+        db.session.commit()
+
+    response = client.get(
+        "/invoices/admin",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json[0]["invoice_number"] == "INV-ADMIN-001"
+    assert response.json[0]["customer_name"] == "Test User"
+    assert response.json[0]["total"] == 12500
+
+
+def test_client_cannot_list_all_invoices(client):
+    token = create_user_token(client)
+
+    response = client.get(
+        "/invoices/admin",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 403
 
 
 def test_checkout(client):
