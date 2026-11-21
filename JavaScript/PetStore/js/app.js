@@ -9,11 +9,14 @@ import {
   saveLastOrder,
   saveSession,
 } from "./storage.js";
+import { cartItemCard, field, invoiceRow, productCard, productRow } from "./views.js";
+import { EMAIL_PATTERN, validateAuth, readProductForm } from "./validation.js";
+import { createRouter } from "./router.js";
+import { registerAppEvents } from "./events.js";
 
 const app = document.querySelector("#app");
 const header = document.querySelector("#site-header");
 const toastRegion = document.querySelector("#toast-region");
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const currency = new Intl.NumberFormat("es-CR", { style: "currency", currency: "CRC", maximumFractionDigits: 0 });
 
 function escapeHTML(value = "") {
@@ -186,18 +189,7 @@ function renderAuth(mode) {
     </section>`, "auth-page");
 }
 
-function field(name, label, type, placeholder, options = {}) {
-  const attrs = [
-    options.autocomplete ? `autocomplete="${options.autocomplete}"` : "",
-    options.minLength ? `minlength="${options.minLength}"` : "",
-    options.maxLength ? `maxlength="${options.maxLength}"` : "",
-    type === "email" ? 'inputmode="email"' : "",
-  ].filter(Boolean).join(" ");
-  return `<label class="field">${label}<input name="${name}" type="${type}" placeholder="${placeholder}" ${attrs} required></label>`;
-}
-
 function renderProducts(products = null) {
-  const session = getSession();
   layout(`
     <section class="section-heading">
       <div><span class="eyebrow">La tienda</span><h1>Catálogo para colitas felices</h1><p>Encuentra algo especial para tu compañero de aventuras.</p></div>
@@ -210,28 +202,11 @@ function renderProducts(products = null) {
     <div class="product-grid" id="product-grid" aria-live="polite"></div>`);
   if (products === null) return;
   const grid = document.querySelector("#product-grid");
+  const viewHelpers = { escapeHTML, formatPrice, productIcon };
   grid.innerHTML = products.length
-    ? products.map((product) => productCard(product, session)).join("")
+    ? products.map((product) => productCard(product, viewHelpers)).join("")
     : emptyState("🐾", "Todavía no hay productos", "Estamos preparando el catálogo. Vuelve pronto.");
   filterProducts();
-}
-
-function productCard(product) {
-  const outOfStock = Number(product.stock) < 1;
-  const category = product.category || "Favoritos";
-  return `<article class="product-card">
-    <a class="product-visual ${outOfStock ? "is-unavailable" : ""}" href="#product/${encodeURIComponent(product.id)}" aria-label="Ver ${escapeHTML(product.name)}">
-      <span class="product-category">${escapeHTML(category)}</span><span class="product-emoji" aria-hidden="true">${productIcon(product)}</span>
-      <span class="visual-doodle" aria-hidden="true">✦</span>
-    </a>
-    <div class="product-info">
-      <h2><a href="#product/${encodeURIComponent(product.id)}">${escapeHTML(product.name || "Producto")}</a></h2>
-      <p class="product-description">${escapeHTML(product.description || "Un detalle especial para tu mascota.")}</p>
-      <div class="product-card-bottom"><span class="price">${formatPrice(product.price)}</span>
-        <span class="stock ${outOfStock ? "stock-out" : ""}">${outOfStock ? "Agotado" : `${Number(product.stock)} disponibles`}</span></div>
-      <a class="button button-full button-small" href="#product/${encodeURIComponent(product.id)}">Ver detalles <span aria-hidden="true">→</span></a>
-    </div>
-  </article>`;
 }
 
 function filterProducts() {
@@ -242,17 +217,25 @@ function filterProducts() {
   const query = search.value.trim().toLocaleLowerCase();
   let visibleCount = 0;
   grid.querySelectorAll(".product-card").forEach((card) => {
-    const matchesText = card.textContent.toLocaleLowerCase().includes(query);
+    const searchableText = [
+      card.querySelector("h2")?.textContent,
+      card.querySelector(".product-description")?.textContent,
+      card.querySelector(".product-category")?.textContent,
+    ].join(" ").toLocaleLowerCase();
+    const matchesText = searchableText.includes(query);
     const matchesStock = !available.checked || Number(card.dataset.stock) > 0;
     card.hidden = !matchesText || !matchesStock;
     if (!card.hidden) visibleCount += 1;
   });
   const count = document.querySelector("#catalog-count");
   if (count) count.textContent = `${visibleCount} ${visibleCount === 1 ? "producto" : "productos"}`;
+  const filterEmpty = grid.querySelector("[data-filter-empty]");
   if (!visibleCount && grid.querySelector(".product-card")) {
-    grid.insertAdjacentHTML("beforeend", '<p class="empty-inline" data-filter-empty>No encontramos coincidencias. Prueba con otra búsqueda.</p>');
+    if (!filterEmpty) {
+      grid.insertAdjacentHTML("beforeend", '<p class="empty-inline" data-filter-empty>No encontramos coincidencias. Prueba con otra búsqueda.</p>');
+    }
   } else {
-    grid.querySelector("[data-filter-empty]")?.remove();
+    filterEmpty?.remove();
   }
 }
 
@@ -265,9 +248,6 @@ async function loadProducts() {
   try {
     const products = await api.getProducts();
     renderProducts(Array.isArray(products) ? products : []);
-    document.querySelectorAll(".product-card").forEach((card, index) => {
-      card.dataset.stock = String(products[index]?.stock ?? 0);
-    });
   } catch (error) {
     routeError(error);
   }
@@ -355,7 +335,7 @@ async function loadCart() {
   layout(`
     <section class="section-heading cart-heading"><div><span class="eyebrow">Tu selección</span><h1>Carrito de compras</h1><p>Revisa tus productos antes de continuar.</p></div></section>
     <section class="cart-layout">
-      <div class="cart-items">${cart.items.map(cartItemCard).join("")}</div>
+      <div class="cart-items">${cart.items.map((item) => cartItemCard(item, { escapeHTML, formatPrice, productIcon })).join("")}</div>
       <aside class="summary-card">
         <span class="eyebrow">Casi listo</span><h2>Resumen del pedido</h2>
         <div class="summary-line"><span>Productos (${cart.items.reduce((sum, item) => sum + Number(item.quantity), 0)})</span><strong>${formatPrice(cart.total)}</strong></div>
@@ -367,23 +347,12 @@ async function loadCart() {
     </section>`);
 }
 
-function cartItemCard(item) {
-  return `<article class="cart-item">
-    <div class="cart-item-icon" aria-hidden="true">${productIcon({ name: item.product_name })}</div>
-    <div class="cart-item-name"><h2>${escapeHTML(item.product_name)}</h2><p>${formatPrice(item.price)} c/u</p></div>
-    <div class="quantity-controls" aria-label="Cantidad">
-      <button type="button" aria-label="Disminuir cantidad" data-cart-action="decrease" data-item-id="${item.item_id}" data-quantity="${item.quantity}">−</button>
-      <span>${Number(item.quantity)}</span>
-      <button type="button" aria-label="Aumentar cantidad" data-cart-action="increase" data-item-id="${item.item_id}" data-quantity="${item.quantity}">+</button>
-    </div>
-    <strong class="cart-subtotal">${formatPrice(item.subtotal)}</strong>
-    <button class="remove-button" type="button" data-cart-action="remove" data-item-id="${item.item_id}">Quitar</button>
-  </article>`;
-}
-
-async function changeCart(action, itemId, currentQuantity) {
+async function changeCart(action, itemId, currentQuantity, button) {
   const session = requireSession();
   if (!session) return;
+  if (button.disabled) return;
+  const actionButtons = button.closest(".cart-item")?.querySelectorAll("[data-cart-action]");
+  actionButtons?.forEach((actionButton) => { actionButton.disabled = true; });
   try {
     if (action === "remove") {
       await api.deleteCartItem(itemId, session.token);
@@ -398,6 +367,10 @@ async function changeCart(action, itemId, currentQuantity) {
     await loadCart();
   } catch (error) {
     showError(error);
+  } finally {
+    actionButtons?.forEach((actionButton) => {
+      if (actionButton.isConnected) actionButton.disabled = false;
+    });
   }
 }
 
@@ -476,10 +449,10 @@ async function loadAdmin() {
       <section class="section-heading admin-heading"><div><span class="eyebrow">Espacio de gestión</span><h1>Administración</h1><p>Controla el catálogo y revisa el estado del inventario.</p></div></section>
       <section class="admin-stats"><article><span>Productos en catálogo</span><strong>${products.length}</strong></article><article><span>Unidades disponibles</span><strong>${products.reduce((sum, item) => sum + (Number(item.stock) || 0), 0)}</strong></article><article><span>Ventas registradas</span><strong>${invoices.length}</strong></article><article><span>Total vendido</span><strong>${formatPrice(totalSales)}</strong></article></section>
       <section class="admin-panel"><div class="panel-heading"><div><span class="eyebrow">Inventario</span><h2>Productos</h2></div><a class="button button-small" href="#admin/new">+ Agregar producto</a></div>
-        ${products.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead><tbody>${products.map((product) => `<tr><td><strong>${escapeHTML(product.name)}</strong><small class="table-description">${escapeHTML(product.description || "")}</small></td><td>${escapeHTML(product.category || "—")}</td><td>${formatPrice(product.price)}</td><td><span class="stock-pill ${Number(product.stock) < 1 ? "stock-pill-out" : ""}">${Number(product.stock)}</span></td><td><div class="table-actions"><a class="button button-outline button-small" href="#admin/edit/${encodeURIComponent(product.id)}">Editar</a><button class="button button-danger button-small" data-delete-product="${escapeHTML(product.id)}" type="button">Eliminar</button></div></td></tr>`).join("")}</tbody></table></div>` : emptyState("🐾", "El inventario está vacío", "Agrega el primer producto para iniciar el catálogo.", "#admin/new", "Agregar producto")}
+        ${products.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead><tbody>${products.map((product) => productRow(product, { escapeHTML, formatPrice })).join("")}</tbody></table></div>` : emptyState("🐾", "El inventario está vacío", "Agrega el primer producto para iniciar el catálogo.", "#admin/new", "Agregar producto")}
       </section>
       <section class="admin-panel sales-panel"><div class="panel-heading"><div><span class="eyebrow">Actividad de la tienda</span><h2>Ventas recientes</h2></div></div>
-        <div class="table-wrap"><table class="data-table"><thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead><tbody>${invoices.length ? invoices.map((invoice) => `<tr><td><strong>${escapeHTML(invoice.invoice_number)}</strong></td><td>${escapeHTML(invoice.customer_name)}</td><td>${formatDate(invoice.created_at)}</td><td>${formatPrice(invoice.total)}</td><td><span class="stock-pill ${invoice.status === "REFUNDED" ? "stock-pill-out" : ""}">${escapeHTML(invoice.status)}</span></td></tr>`).join("") : '<tr><td colspan="5"><div class="api-limitation"><strong>Aún no hay ventas registradas.</strong><span>Las compras completadas aparecerán aquí.</span></div></td></tr>'}</tbody></table></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead><tbody>${invoices.length ? invoices.map((invoice) => invoiceRow(invoice, { escapeHTML, formatDate, formatPrice })).join("") : '<tr><td colspan="5"><div class="api-limitation"><strong>Aún no hay ventas registradas.</strong><span>Las compras completadas aparecerán aquí.</span></div></td></tr>'}</tbody></table></div>
       </section>`);
   } catch (error) {
     routeError(error, "#home");
@@ -505,9 +478,9 @@ async function loadProductForm(id = null) {
       <form id="product-form" class="form-card product-form" novalidate data-product-id="${editing ? escapeHTML(product.id) : ""}">
         ${field("name", "Nombre", "text", "Ej. Juguete resistente", { minLength: 2, maxLength: 100 })}
         <label class="field">Descripción<textarea name="description" rows="4" maxlength="2000" placeholder="Cuéntanos qué hace especial a este producto"></textarea></label>
-        ${field("price", "Precio (₡)", "number", "0", {})}
+        ${field("price", "Precio (₡)", "number", "0", { min: 0, step: "0.01" })}
         ${field("category", "Categoría", "text", "Ej. Juguetes", { maxLength: 100 })}
-        ${field("stock", "Unidades disponibles", "number", "0", {})}
+        ${field("stock", "Unidades disponibles", "number", "0", { min: 0, step: 1 })}
         <p class="form-message" data-form-message aria-live="polite"></p>
         <div class="form-actions"><a class="button button-quiet" href="#admin">Cancelar</a><button class="button" type="submit">${editing ? "Guardar cambios" : "Crear producto"}</button></div>
       </form>
@@ -520,37 +493,35 @@ async function loadProductForm(id = null) {
     form.elements.category.value = product.category || "";
     form.elements.stock.value = product.stock ?? 0;
   }
-  form.elements.price.min = "0";
-  form.elements.price.step = "0.01";
-  form.elements.stock.min = "0";
-  form.elements.stock.step = "1";
 }
 
-function currentRoute() {
-  const [route, ...parts] = location.hash.replace(/^#\/?/, "").split("/");
-  return { route: route || "home", parts: parts.map((part) => decodeURIComponent(part)) };
-}
-
-async function renderRoute() {
-  updateHeader();
-  const { route, parts } = currentRoute();
-  if (route === "home") return renderHome();
-  if (route === "about") {
-    await renderHome();
-    document.querySelector("#about")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    return;
-  }
-  if (route === "login" || route === "register") return renderAuth(route);
-  if (route === "products") return loadProducts();
-  if (route === "product" && parts[0]) return loadProduct(parts[0]);
-  if (route === "cart") return loadCart();
-  if (route === "checkout") return loadCheckout();
-  if (route === "success") return loadSuccess();
-  if (route === "admin" && parts[0] === "edit" && parts[1]) return loadProductForm(parts[1]);
-  if (route === "admin" && parts[0] === "new") return loadProductForm();
-  if (route === "admin") return loadAdmin();
+function renderNotFound() {
   layout(`${emptyState("🐾", "No encontramos esa página", "La dirección puede haber cambiado.", "#home", "Volver al inicio")}`);
 }
+
+const renderRoute = createRouter({
+  beforeRoute: updateHeader,
+  routes: {
+    home: renderHome,
+    about: () => {
+      renderHome();
+      document.querySelector("#about")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    },
+    login: () => renderAuth("login"),
+    register: () => renderAuth("register"),
+    products: loadProducts,
+    product: (id) => id ? loadProduct(id) : renderNotFound(),
+    cart: loadCart,
+    checkout: loadCheckout,
+    success: loadSuccess,
+    admin: (section, id) => {
+      if (section === "edit" && id) return loadProductForm(id);
+      if (section === "new") return loadProductForm();
+      return loadAdmin();
+    },
+  },
+  notFound: renderNotFound,
+});
 
 function setFormMessage(form, message, isError = false) {
   const node = form.querySelector("[data-form-message]");
@@ -567,18 +538,6 @@ function setBusy(form, busy) {
     button.dataset.originalText ||= button.textContent;
     button.textContent = busy ? "Procesando…" : button.dataset.originalText;
   }
-}
-
-function validateAuth(form, mode) {
-  const values = new FormData(form);
-  const name = String(values.get("name") || "").trim();
-  const email = String(values.get("email") || "").trim();
-  const password = String(values.get("password") || "");
-  if (mode === "register" && (name.length < 2 || name.length > 100)) return "El nombre debe tener entre 2 y 100 caracteres.";
-  if (!EMAIL_PATTERN.test(email) || email.length > 255) return "Ingresa un correo electrónico válido.";
-  if (password.length < 6) return "La contraseña debe tener al menos 6 caracteres.";
-  if (mode === "register" && values.get("confirmation") !== password) return "Las contraseñas no coinciden.";
-  return null;
 }
 
 function decodeToken(token) {
@@ -613,12 +572,13 @@ async function submitAuth(form, mode) {
     const response = await api.login({ email, password: values.get("password") });
     if (!response?.access_token) throw new Error("El API no devolvió un token de acceso.");
     const claims = decodeToken(response.access_token);
+    const user = response.user || {};
     saveSession({
       token: response.access_token,
-      role: claims.role || "client",
-      userId: claims.sub || "",
-      name: name || email.split("@")[0],
-      email,
+      role: claims.role || user.role || "client",
+      userId: claims.sub || user.id || "",
+      name: user.name || claims.name || name || email.split("@")[0],
+      email: user.email || email,
     });
     updateHeader();
     showToast("¡Bienvenido a Lyfter Pet Store!");
@@ -628,22 +588,6 @@ async function submitAuth(form, mode) {
   } finally {
     setBusy(form, false);
   }
-}
-
-function readProductForm(form) {
-  const values = new FormData(form);
-  const name = String(values.get("name") || "").trim();
-  const description = String(values.get("description") || "").trim();
-  const category = String(values.get("category") || "").trim();
-  const priceText = String(values.get("price") || "").trim();
-  const stockText = String(values.get("stock") || "").trim();
-  const price = Number(priceText);
-  const stock = Number(stockText);
-  if (name.length < 2 || name.length > 100) throw new Error("El nombre debe tener entre 2 y 100 caracteres.");
-  if (priceText === "" || !Number.isFinite(price) || price < 0) throw new Error("El precio debe ser un número igual o mayor a cero.");
-  if (stockText === "" || !Number.isInteger(stock) || stock < 0) throw new Error("El stock debe ser un entero igual o mayor a cero.");
-  if (category.length > 100) throw new Error("La categoría no puede superar los 100 caracteres.");
-  return { name, description, price, stock, category };
 }
 
 async function submitProduct(form) {
@@ -704,66 +648,39 @@ async function submitCheckout(form) {
   }
 }
 
-document.addEventListener("submit", (event) => {
-  const form = event.target;
-  if (!(form instanceof HTMLFormElement)) return;
-  event.preventDefault();
-  if (form.id === "login-form") submitAuth(form, "login");
-  if (form.id === "register-form") submitAuth(form, "register");
-  if (form.id === "product-form") submitProduct(form);
-  if (form.id === "checkout-form") submitCheckout(form);
+function logout() {
+  clearSession();
+  updateHeader();
+  showToast("Has cerrado sesión.");
+  location.hash = "#home";
+}
+
+async function deleteAdminProduct(button) {
+  const session = requireSession({ admin: true });
+  if (!session || !window.confirm("¿Eliminar este producto del catálogo?")) return;
+  button.disabled = true;
+  try {
+    await api.deleteProduct(button.dataset.deleteProduct, session.token);
+    showToast("El producto se eliminó.");
+    await loadAdmin();
+  } catch (error) {
+    button.disabled = false;
+    showError(error);
+  }
+}
+
+registerAppEvents({
+  header,
+  renderRoute,
+  filterProducts,
+  submitAuth,
+  submitProduct,
+  submitCheckout,
+  logout,
+  addToCart,
+  changeCart,
+  deleteProduct: deleteAdminProduct,
 });
 
-document.addEventListener("click", async (event) => {
-  const menuButton = event.target.closest(".menu-toggle");
-  if (menuButton) {
-    const nav = header.querySelector(".main-nav");
-    const expanded = menuButton.getAttribute("aria-expanded") === "true";
-    menuButton.setAttribute("aria-expanded", String(!expanded));
-    nav.classList.toggle("nav-open", !expanded);
-    return;
-  }
-  const logoutButton = event.target.closest('[data-action="logout"]');
-  if (logoutButton) {
-    clearSession();
-    updateHeader();
-    showToast("Has cerrado sesión.");
-    location.hash = "#home";
-    return;
-  }
-  const addButton = event.target.closest("[data-add-product]");
-  if (addButton) {
-    const quantity = document.querySelector("#detail-quantity")?.value || "1";
-    await addToCart(addButton.dataset.addProduct, quantity);
-    return;
-  }
-  const cartButton = event.target.closest("[data-cart-action]");
-  if (cartButton) {
-    await changeCart(cartButton.dataset.cartAction, cartButton.dataset.itemId, cartButton.dataset.quantity);
-    return;
-  }
-  const deleteButton = event.target.closest("[data-delete-product]");
-  if (deleteButton) {
-    const session = requireSession({ admin: true });
-    if (!session || !window.confirm("¿Eliminar este producto del catálogo?")) return;
-    deleteButton.disabled = true;
-    try {
-      await api.deleteProduct(deleteButton.dataset.deleteProduct, session.token);
-      showToast("El producto se eliminó.");
-      await loadAdmin();
-    } catch (error) {
-      deleteButton.disabled = false;
-      showError(error);
-    }
-  }
-});
-
-document.addEventListener("input", (event) => {
-  if (event.target.id === "product-search") filterProducts();
-});
-document.addEventListener("change", (event) => {
-  if (event.target.id === "available-only") filterProducts();
-});
-window.addEventListener("hashchange", renderRoute);
 if (!location.hash) location.hash = "#home";
 renderRoute();

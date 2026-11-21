@@ -2,9 +2,28 @@ const SESSION_KEY = "lyfter-petstore-session";
 const CART_KEY = "lyfter-petstore-cart";
 const ORDER_KEY = "lyfter-petstore-last-order";
 
+function readStoredValue(key, isValid) {
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+
+  try {
+    const value = JSON.parse(raw);
+    if (!isValid(value)) throw new Error("Invalid stored value");
+    return value;
+  } catch {
+    localStorage.removeItem(key);
+    return null;
+  }
+}
+
 export function getSession() {
-  const raw = localStorage.getItem(SESSION_KEY);
-  return raw ? JSON.parse(raw) : null;
+  return readStoredValue(SESSION_KEY, (value) => (
+    value !== null
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && typeof value.token === "string"
+    && value.token.length > 0
+  ));
 }
 
 export function saveSession(session) {
@@ -16,8 +35,9 @@ export function clearSession() {
 }
 
 export function getSavedCart() {
-  const raw = localStorage.getItem(CART_KEY);
-  return raw ? JSON.parse(raw) : null;
+  return readStoredValue(CART_KEY, (value) => (
+    value !== null && typeof value === "object" && !Array.isArray(value) && Array.isArray(value.items)
+  ));
 }
 
 export function saveCart(cart) {
@@ -33,6 +53,11 @@ export function saveLastOrder(order) {
 }
 
 export function getLastOrder() {
-  const raw = localStorage.getItem(ORDER_KEY);
-  return raw ? JSON.parse(raw) : null;
+  return readStoredValue(ORDER_KEY, (value) => (
+    value !== null
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && Array.isArray(value.items)
+    && (value.invoice_id != null || typeof value.invoice_number === "string")
+  ));
 }

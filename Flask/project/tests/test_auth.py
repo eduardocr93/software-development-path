@@ -74,6 +74,33 @@ def test_login_success(client):
     assert token
 
 
+def test_login_returns_user_details_without_password(client):
+    email = random_email("login-details")
+    client.post(
+        "/auth/register",
+        json={
+            "name": "Login Details User",
+            "email": email,
+            "password": "123456"
+        }
+    )
+
+    response = client.post(
+        "/auth/login",
+        json={
+            "email": email,
+            "password": "123456"
+        }
+    )
+
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["user"]["name"] == "Login Details User"
+    assert body["user"]["email"] == email
+    assert body["user"]["role"] == "client"
+    assert "password" not in body["user"]
+
+
 def test_login_invalid_password(client):
     email = random_email("login")
     client.post(
