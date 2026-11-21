@@ -19,6 +19,8 @@ API backend para un e-commerce de productos para mascotas. Proyecto desarrollado
 - PostgreSQL
 - Redis (opcional, para cacheo de productos)
 
+El caché es opcional: si Redis no está disponible, los endpoints de productos continúan consultando la base de datos y se registra una advertencia.
+
 ## Configuración
 
 1. Abre la terminal en `Project`.
@@ -34,6 +36,7 @@ copy .env.example .env
 - `JWT_SECRET_KEY` — clave secreta para JWT.
 - `JWT_ACCESS_TOKEN_EXPIRES` — expiración del token.
 - `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_DB` — datos de Redis.
+- `FRONTEND_ORIGINS` — orígenes permitidos para el frontend, separados por comas. Por defecto permite `http://127.0.0.1:8765`, `http://localhost:8765`, `http://127.0.0.1:5500` y `http://localhost:5500`.
 
 4. Instala las dependencias:
 
@@ -54,6 +57,16 @@ Abre en el navegador o Postman:
 ```
 http://127.0.0.1:5000
 ```
+
+Para usar el frontend de `JavaScript/PetStore`, inicia su servidor local en el puerto `8765` (o configura el origen que uses en `FRONTEND_ORIGINS`). CORS solo se habilita para los orígenes enumerados y no acepta credenciales de cookies.
+
+Para habilitar una cuenta de administración, primero regístrala como cliente y luego ejecuta desde esta carpeta:
+
+```bash
+python -m flask promote-admin correo@ejemplo.com
+```
+
+El comando solo está disponible en la CLI local; no existe un endpoint público para elevar roles. Cierra sesión e inicia sesión de nuevo para que el token incluya el nuevo rol.
 
 ## Migraciones
 
@@ -139,6 +152,7 @@ python -m flask db upgrade
     }
     ```
 - `GET /invoices/` — Lista facturas del usuario.
+- `GET /invoices/admin` — Lista todas las facturas para el panel de administración (admin).
 - `GET /invoices/<invoice_id>` — Detalle de factura.
 - `POST /invoices/<invoice_id>/refund` — Devuelve factura (admin).
 

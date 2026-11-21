@@ -1,6 +1,12 @@
+import os
+from unittest.mock import Mock
+
 import pytest
 
+os.environ["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+
 from app import app
+from config.cache import cache
 from config.database import db
 
 
@@ -10,6 +16,9 @@ def clean_database():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
 
     with app.app_context():
+        assert db.engine.url.drivername == "sqlite"
+        cache.redis_client = Mock()
+        cache.redis_client.get.return_value = None
         db.create_all()
         yield
         db.session.remove()
